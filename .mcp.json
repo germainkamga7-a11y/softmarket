@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "firebase": {
+      "command": "firebase",
+      "args": [
+        "mcp",
+        "--dir",
+        "C:\\Users\\germa\\Desktop\\projet\\softmarket"
+      ],
+      "env": {
+        "FIREBASE_PROJECT_ID": "softmarket-55f22"
+      }
+    },
+    "flutter": {
+      "command": "node",
+      "args": [
+        "C:\\Users\\germa\\Desktop\\projet\\softmarket\\tools\\flutter-mcp\\server.js"
+      ],
+      "env": {
+        "FLUTTER_PROJECT_PATH": "C:\\Users\\germa\\Desktop\\projet\\softmarket",
+        "JAVA_HOME": "C:\\Program Files\\Android\\Android Studio\\jbr"
+      }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "hosting": {
+    "public": "build/web",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css|woff2|ttf|otf)",
+        "headers": [{"key": "Cache-Control", "value": "max-age=31536000, immutable"}]
+      },
+      {
+        "source": "/index.html",
+        "headers": [{"key": "Cache-Control", "value": "no-cache"}]
+      }
+    ]
+  },
+  "firestore": {"rules": "firestore.rules", "indexes": "firestore.indexes.json"},
+  "storage": {"rules": "storage.rules"},
+  "emulators": {
+    "auth": {"port": 9099},
+    "firestore": {"port": 8080},
+    "ui": {"enabled": true, "port": 4000},
+    "singleProjectMode": true
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "softmarket-55f22",
+          "appId": "1:795518110767:android:7977cac0b15ca33b7c4ada",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "softmarket-55f22",
+          "configurations": {
+            "android": "1:795518110767:android:7977cac0b15ca33b7c4ada",
+            "web": "1:795518110767:web:12f2e5ac320fee117c4ada"
+          }
+        }
+      }
+    }
+  }
+}

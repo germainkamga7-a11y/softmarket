@@ -1,0 +1,86 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helpers
+    function isAuth() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    // ── Utilisateurs ─────────────────────────────────────────────────────────
+    match /users/{userId} {
+      allow read: if isAuth();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    // ── Commerces / Boutiques ────────────────────────────────────────────────
+    match /commercants/{commerceId} {
+      allow read: if true;
+      allow create: if isAuth();
+      allow update: if isAuth()
+        && request.auth.uid == resource.data.user_id;
+      allow delete: if isAuth()
+        && request.auth.uid == resource.data.user_id;
+    }
+
+    // ── Produits ─────────────────────────────────────────────────────────────
+    function isCommerceOwner() {
+      return isAuth() &&
+        get(/databases/$(database)/documents/commercants/$(resource.data.commerce_id))
+          .data.user_id == request.auth.uid;
+    }
+
+    match /produits/{produitId} {
+      allow read: if true;
+      allow create: if isAuth();
+      allow update, delete: if isCommerceOwner();
+    }
+
+    // ── Favoris ──────────────────────────────────────────────────────────────
+    match /favorites/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // ── Avis ─────────────────────────────────────────────────────────────────
+    match /reviews/{commerceId} {
+      // Agrégat (avg_rating, count) : lecture publique, écriture via transaction auth
+      allow read: if true;
+      allow write: if isAuth();
+
+      match /items/{userId} {
+        allow read: if true;
+        allow create, update: if isOwner(userId);
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    // ── Conversations ────────────────────────────────────────────────────────
+    match /conversations/{convId} {
+      allow read: if isAuth()
+        && resource != null
+        && request.auth.uid in resource.data.participants;
+      allow create: if isAuth();
+      allow update: if isAuth()
+        && resource != null
+        && request.auth.uid in resource.data.participants;
+      allow delete: if false;
+
+      match /messages/{messageId} {
+        allow read: if isAuth()
+          && request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participants;
+        allow create: if isAuth()
+          && (
+            !exists(/databases/$(database)/documents/conversations/$(convId))
+            || request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participants
+          );
+        allow update, delete: if false;
+      }
+    }
+  }
+}
