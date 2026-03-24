@@ -1898,60 +1898,6 @@ class _ReviewSheetState extends State<_ReviewSheet> {
   }
 }
 
-// ─── Placeholder image ────────────────────────────────────────────────────────
-
-class _PlaceholderImage extends StatelessWidget {
-  final String categorie;
-  final ColorScheme colorScheme;
-
-  const _PlaceholderImage(
-      {required this.categorie, required this.colorScheme});
-
-  IconData get _icon {
-    final c = categorie.toLowerCase();
-    if (c.contains('aliment') || c.contains('boulang') || c.contains('boucher') ||
-        c.contains('fruit') || c.contains('boisson')) { return Icons.restaurant; }
-    if (c.contains('électron') || c.contains('télépho') || c.contains('informat')) {
-      return Icons.phone_android;
-    }
-    if (c.contains('mode') || c.contains('vêtem') || c.contains('chaussure')) {
-      return Icons.checkroom;
-    }
-    if (c.contains('agricult') || c.contains('élevage')) return Icons.agriculture;
-    if (c.contains('matér') || c.contains('construct') || c.contains('quincail')) {
-      return Icons.construction;
-    }
-    if (c.contains('santé') || c.contains('pharma') || c.contains('médic')) {
-      return Icons.local_hospital;
-    }
-    if (c.contains('coiff') || c.contains('beauté') || c.contains('cosm')) {
-      return Icons.face;
-    }
-    if (c.contains('restaur') || c.contains('fast') || c.contains('traiteur')) {
-      return Icons.fastfood;
-    }
-    if (c.contains('transport') || c.contains('livraison')) return Icons.local_shipping;
-    if (c.contains('mécan')) return Icons.car_repair;
-    if (c.contains('électr') || c.contains('plomb')) return Icons.electrical_services;
-    if (c.contains('numér') || c.contains('informat')) return Icons.computer;
-    if (c.contains('infograph') || c.contains('design') || c.contains('photo')) {
-      return Icons.palette;
-    }
-    if (c.contains('événem') || c.contains('animat')) return Icons.celebration;
-    if (c.contains('éducat') || c.contains('format')) return Icons.school;
-    if (c.contains('couture') || c.contains('retouche')) return Icons.cut;
-    return Icons.category;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: colorScheme.primaryContainer,
-      child: Icon(_icon, size: 40, color: colorScheme.primary),
-    );
-  }
-}
-
 // ─── Bottom sheet modifier boutique ──────────────────────────────────────────
 
 class _EditBoutiqueSheet extends StatefulWidget {

@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'screens/camer_market_screen.dart';
-import 'screens/login_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'firebase_options.dart';
 import 'services/notification_service.dart';
@@ -126,41 +125,40 @@ class _AuthGate extends StatefulWidget {
 }
 
 class _AuthGateState extends State<_AuthGate> {
-  // Le stream est créé UNE SEULE FOIS en initState.
-  // Si _AuthGate était StatelessWidget, chaque rebuild recréerait un nouveau
-  // stream → StreamBuilder se réabonnait → le timeout de 10 s se réinitialisait
-  // en boucle → splash infinie.
   late final Stream<User?> _authStream;
+  // Fallback indépendant du stream : force la sortie du splash après N secondes
+  // même si Firebase ne répond pas (iOS Safari, réseau lent, etc.)
+  bool _timedOut = false;
 
   @override
   void initState() {
     super.initState();
-    // Timeout plus court sur web (5s) car pas de restauration locale
-    final timeoutDuration =
-        kIsWeb ? const Duration(seconds: 5) : const Duration(seconds: 10);
-    _authStream = FirebaseAuth.instance.authStateChanges().timeout(
-      timeoutDuration,
-      onTimeout: (sink) => sink.add(null),
-    );
+    _authStream = FirebaseAuth.instance.authStateChanges();
+
+    const timeoutDuration =
+        kIsWeb ? Duration(seconds: 6) : Duration(seconds: 12);
+    Future.delayed(timeoutDuration, () {
+      if (mounted) setState(() => _timedOut = true);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: _authStream,
-      builder: (context, authSnapshot) {
-        if (authSnapshot.hasError) {
-          debugPrint('[AuthGate] Erreur stream auth : ${authSnapshot.error}');
+      builder: (context, snap) {
+        if (snap.hasError) {
+          debugPrint('[AuthGate] Erreur stream auth : ${snap.error}');
         }
 
-        if (authSnapshot.connectionState == ConnectionState.waiting) {
-          return const _SplashScreen();
-        }
-        // Utilisateur connecté → app principale
-        if (authSnapshot.hasData) {
-          return const CamerMarketScreen();
-        }
-        // Non connecté → écran de bienvenue
+        // Splash seulement si on attend encore ET que le timeout n'a pas expiré
+        final isWaiting =
+            snap.connectionState == ConnectionState.waiting && !_timedOut;
+        if (isWaiting) return const _SplashScreen();
+
+        // Vérification stream + fallback synchrone (currentUser)
+        final user = snap.data ?? FirebaseAuth.instance.currentUser;
+        if (user != null) return const CamerMarketScreen();
         return const WelcomeScreen();
       },
     );

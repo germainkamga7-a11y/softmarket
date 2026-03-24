@@ -312,11 +312,11 @@ class _MessageBubble extends StatelessWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
               color: AppColors.boutique.withValues(alpha: 0.1),
-              child: Row(
+              child: const Row(
                 children: [
                   Icon(Icons.inventory_2_outlined,
                       size: 13, color: AppColors.boutique),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6),
                   Text(
                     'Produit partagé',
                     style: TextStyle(
@@ -353,7 +353,7 @@ class _MessageBubble extends StatelessWidget {
                             width: 64,
                             height: 64,
                             color: AppColors.boutiqueLight,
-                            child: Icon(Icons.inventory_2_outlined,
+                            child: const Icon(Icons.inventory_2_outlined,
                                 color: AppColors.boutique, size: 28),
                           ),
                   ),
@@ -380,7 +380,7 @@ class _MessageBubble extends StatelessWidget {
                           ),
                           child: Text(
                             '${prix.toStringAsFixed(0)} FCFA',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: AppColors.priceText,
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
