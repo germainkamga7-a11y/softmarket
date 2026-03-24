@@ -3,84 +3,127 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helpers
+    // ── Helpers ───────────────────────────────────────────────────────────────
     function isAuth() {
       return request.auth != null;
     }
+
     function isOwner(uid) {
       return isAuth() && request.auth.uid == uid;
     }
 
-    // ── Utilisateurs ─────────────────────────────────────────────────────────
+    function hasFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function notChanging(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    // ── Utilisateurs ──────────────────────────────────────────────────────────
     match /users/{userId} {
       allow read: if isAuth();
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && hasFields(['username', 'phone', 'created_at']);
+      allow update: if isOwner(userId)
+        && notChanging(['phone', 'created_at']);
       allow delete: if isOwner(userId);
     }
 
-    // ── Commerces / Boutiques ────────────────────────────────────────────────
+    // ── Commerces / Boutiques ─────────────────────────────────────────────────
     match /commercants/{commerceId} {
       allow read: if true;
-      allow create: if isAuth();
+      allow create: if isAuth()
+        && hasFields(['nom_boutique', 'user_id', 'position', 'type', 'created_at'])
+        && request.resource.data.user_id == request.auth.uid
+        // verified ne peut être mis qu'à false à la création
+        && (!request.resource.data.keys().hasAll(['verified'])
+            || request.resource.data.verified == false);
       allow update: if isAuth()
-        && request.auth.uid == resource.data.user_id;
+        && resource.data.user_id == request.auth.uid
+        // Interdire la modification de verified, user_id et created_at
+        && notChanging(['verified', 'user_id', 'created_at']);
       allow delete: if isAuth()
-        && request.auth.uid == resource.data.user_id;
+        && resource.data.user_id == request.auth.uid;
     }
 
-    // ── Produits ─────────────────────────────────────────────────────────────
-    function isCommerceOwner() {
+    // ── Produits ──────────────────────────────────────────────────────────────
+    function isCommerceOwner(commerceId) {
       return isAuth() &&
-        get(/databases/$(database)/documents/commercants/$(resource.data.commerce_id))
+        get(/databases/$(database)/documents/commercants/$(commerceId))
           .data.user_id == request.auth.uid;
     }
 
     match /produits/{produitId} {
       allow read: if true;
-      allow create: if isAuth();
-      allow update, delete: if isCommerceOwner();
+      allow create: if isAuth()
+        && hasFields(['nom', 'commerce_id', 'created_at'])
+        && isCommerceOwner(request.resource.data.commerce_id);
+      allow update: if isCommerceOwner(resource.data.commerce_id)
+        && notChanging(['commerce_id', 'created_at']);
+      allow delete: if isCommerceOwner(resource.data.commerce_id);
     }
 
-    // ── Favoris ──────────────────────────────────────────────────────────────
+    // ── Favoris ───────────────────────────────────────────────────────────────
     match /favorites/{userId} {
       allow read, write: if isOwner(userId);
     }
 
-    // ── Avis ─────────────────────────────────────────────────────────────────
+    // ── Avis ──────────────────────────────────────────────────────────────────
     match /reviews/{commerceId} {
-      // Agrégat (avg_rating, count) : lecture publique, écriture via transaction auth
+      // Agrégat (avg_rating, count) : lecture publique, mise à jour via transaction auth
       allow read: if true;
       allow write: if isAuth();
 
       match /items/{userId} {
         allow read: if true;
-        allow create, update: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && hasFields(['rating', 'created_at'])
+          && request.resource.data.rating is int
+          && request.resource.data.rating >= 1
+          && request.resource.data.rating <= 5;
         allow delete: if isOwner(userId);
       }
     }
 
-    // ── Conversations ────────────────────────────────────────────────────────
+    // ── Conversations ─────────────────────────────────────────────────────────
     match /conversations/{convId} {
       allow read: if isAuth()
         && resource != null
         && request.auth.uid in resource.data.participants;
-      allow create: if isAuth();
+      allow create: if isAuth()
+        && request.auth.uid in request.resource.data.participants
+        && hasFields(['participants', 'created_at']);
       allow update: if isAuth()
         && resource != null
-        && request.auth.uid in resource.data.participants;
+        && request.auth.uid in resource.data.participants
+        && notChanging(['participants', 'created_at'])
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['last_message', 'last_message_at', 'updated_at', 'participant_names']);
       allow delete: if false;
 
       match /messages/{messageId} {
         allow read: if isAuth()
-          && request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participants;
+          && request.auth.uid in
+            get(/databases/$(database)/documents/conversations/$(convId)).data.participants;
         allow create: if isAuth()
-          && (
-            !exists(/databases/$(database)/documents/conversations/$(convId))
-            || request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participants
-          );
+          && request.auth.uid in
+            get(/databases/$(database)/documents/conversations/$(convId)).data.participants
+          && request.resource.data.sender_id == request.auth.uid
+          && hasFields(['text', 'sender_id', 'created_at']);
         allow update, delete: if false;
       }
+    }
+
+    // ── Signalements ──────────────────────────────────────────────────────────
+    match /reports/{reportId} {
+      allow create: if isAuth()
+        && request.resource.data.reporter_uid == request.auth.uid
+        && hasFields(['reporter_uid', 'target_type', 'target_id', 'reason', 'created_at'])
+        && request.resource.data.target_type in ['commerce', 'produit', 'utilisateur']
+        && request.resource.data.status == 'pending';
+      // Lecture et modération réservées à l'admin via Firebase Console
+      allow read, update, delete: if false;
     }
   }
 }

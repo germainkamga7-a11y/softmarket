@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../services/commerce_service.dart';
+import '../services/report_service.dart';
 import '../services/review_service.dart';
 import '../theme/app_colors.dart';
 import 'product_detail_screen.dart';
@@ -132,6 +133,17 @@ class _BoutiqueScreenState extends State<BoutiqueScreen> {
                     backgroundColor: Colors.transparent,
                     builder: (_) => _EditBoutiqueSheet(commerce: widget.commerce),
                   ),
+                )
+              else
+                IconButton(
+                  icon: const Icon(Icons.flag_outlined),
+                  tooltip: 'Signaler cette boutique',
+                  onPressed: () => showReportDialog(
+                    context,
+                    targetType: ReportTargetType.commerce,
+                    targetId: widget.commerce.id!,
+                    targetName: widget.commerce.nomBoutique,
+                  ),
                 ),
             ],
             flexibleSpace: FlexibleSpaceBar(
@@ -232,6 +244,23 @@ class _BoutiqueScreenState extends State<BoutiqueScreen> {
                                       fontWeight: FontWeight.w600),
                                 ),
                               ),
+                              if (widget.commerce.verified) ...[
+                                const SizedBox(height: 4),
+                                const Row(
+                                  children: [
+                                    Icon(Icons.verified, size: 14, color: Colors.greenAccent),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Commerçant vérifié',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.greenAccent,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                               const SizedBox(height: 4),
                               Text(
                                 'Depuis ${widget.commerce.createdAt.day}/${widget.commerce.createdAt.month}/${widget.commerce.createdAt.year}',

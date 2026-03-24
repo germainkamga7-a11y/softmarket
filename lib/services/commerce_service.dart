@@ -17,6 +17,7 @@ class Commerce {
   final DateTime createdAt;
   final CommerceType type;
   final String? logoUrl;
+  final bool verified;
 
   static const List<String> categoriesBoutique = [
     'Alimentation & Épicerie',
@@ -91,6 +92,7 @@ class Commerce {
     required this.createdAt,
     this.type = CommerceType.boutique,
     this.logoUrl,
+    this.verified = false,
   });
 
   String get typeLabel =>
@@ -110,6 +112,7 @@ class Commerce {
         'type': type.name,
         'position': GeoPoint(position.latitude, position.longitude),
         'created_at': Timestamp.fromDate(createdAt),
+        'verified': false,
         if (logoUrl != null) 'logo_url': logoUrl,
       };
 
@@ -132,6 +135,7 @@ class Commerce {
       position: LatLng(geo.latitude, geo.longitude),
       createdAt: (data['created_at'] as Timestamp).toDate(),
       logoUrl: data['logo_url'] as String?,
+      verified: data['verified'] as bool? ?? false,
     );
   }
 

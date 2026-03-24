@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../services/commerce_service.dart';
+import '../services/report_service.dart';
 import '../theme/app_colors.dart';
 import 'boutique_screen.dart';
 import 'chat_screen.dart';
@@ -416,6 +417,29 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
                   ),
                 ),
               ],
+            ),
+          ),
+
+          // ─── Lien Signaler (discret, en bas) ─────────────────────────────
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).padding.bottom + 4,
+            ),
+            child: Center(
+              child: TextButton.icon(
+                onPressed: () => showReportDialog(
+                  context,
+                  targetType: ReportTargetType.produit,
+                  targetId: widget.docId,
+                  targetName: widget.nom,
+                ),
+                icon: const Icon(Icons.flag_outlined, size: 14, color: Colors.grey),
+                label: const Text(
+                  'Signaler ce produit',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
+              ),
             ),
           ),
         ],
