@@ -7,8 +7,10 @@ import 'package:intl/intl.dart';
 
 import '../services/auth_service.dart';
 import 'camer_market_screen.dart';
+import 'cgu_screen.dart';
 import 'login_screen.dart';
 import 'phone_auth_screen.dart';
+import 'privacy_policy_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -431,6 +433,59 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 32),
 
+              // Texte consentement CGU (requis Play Store)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text.rich(
+                  TextSpan(
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    children: [
+                      const TextSpan(
+                          text: 'En terminant votre inscription, vous acceptez nos '),
+                      WidgetSpan(
+                        child: GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const CguScreen()),
+                          ),
+                          child: Text(
+                            "Conditions d'utilisation",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context).colorScheme.primary,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const TextSpan(text: ' et notre '),
+                      WidgetSpan(
+                        child: GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const PrivacyPolicyScreen()),
+                          ),
+                          child: Text(
+                            'Politique de confidentialité',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context).colorScheme.primary,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const TextSpan(text: '.'),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
               FilledButton(
                 onPressed: _savingProfile ? null : _saveProfile,
                 style: FilledButton.styleFrom(
@@ -444,7 +499,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
                     : const Text(
-                        'Terminer l\'inscription',
+                        "Terminer l'inscription",
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                       ),
               ),

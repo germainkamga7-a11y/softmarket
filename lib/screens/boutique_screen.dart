@@ -8,7 +8,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'package:share_plus/share_plus.dart' show Share;
+import 'package:url_launcher/url_launcher.dart';
+
 import '../services/commerce_service.dart';
+import '../services/mobile_money_service.dart';
 import '../services/report_service.dart';
 import '../services/review_service.dart';
 import '../theme/app_colors.dart';
@@ -98,6 +102,18 @@ class _BoutiqueScreenState extends State<BoutiqueScreen> {
     );
   }
 
+  void _shareBoutique() {
+    final nom = widget.commerce.nomBoutique;
+    final cat = widget.commerce.categorie;
+    final desc = widget.commerce.description.isNotEmpty
+        ? '\n${widget.commerce.description}'
+        : '';
+    Share.share(
+      '🛒 Découvre $nom sur CamerMarket !\n$cat$desc',
+      subject: nom,
+    );
+  }
+
   void _showAddProduitDialog() {
     showModalBottomSheet(
       context: context,
@@ -123,6 +139,11 @@ class _BoutiqueScreenState extends State<BoutiqueScreen> {
             expandedHeight: 180,
             pinned: true,
             actions: [
+              IconButton(
+                icon: const Icon(Icons.share_outlined),
+                tooltip: 'Partager',
+                onPressed: _shareBoutique,
+              ),
               if (_isOwner)
                 IconButton(
                   icon: const Icon(Icons.edit_outlined),
@@ -316,10 +337,91 @@ class _BoutiqueScreenState extends State<BoutiqueScreen> {
             ),
           ),
 
+          // ─── Infos contact ────────────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Description
+                  if (widget.commerce.description.isNotEmpty) ...[
+                    Text(
+                      widget.commerce.description,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                  // Boutons contact
+                  Row(
+                    children: [
+                      if (widget.commerce.telephone.isNotEmpty) ...[
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () async {
+                              final tel = widget.commerce.telephone
+                                  .replaceAll(' ', '');
+                              final number = tel.startsWith('+')
+                                  ? tel
+                                  : '+237$tel';
+                              final uri = Uri(scheme: 'tel', path: number);
+                              if (await canLaunchUrl(uri)) {
+                                await launchUrl(uri);
+                              }
+                            },
+                            icon: const Icon(Icons.phone_outlined, size: 18),
+                            label: Text(
+                              widget.commerce.telephone.isNotEmpty
+                                  ? widget.commerce.telephone
+                                  : 'Appeler',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: _themeColor,
+                              side: BorderSide(color: _themeColor),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      Expanded(
+                        child: FilledButton.icon(
+                          onPressed: () => showMobileMoneySheet(
+                            context,
+                            commerce: widget.commerce,
+                          ),
+                          icon: const Icon(Icons.mobile_friendly, size: 18),
+                          label: const Text('Mobile Money'),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: const Color(0xFFFFB300),
+                            foregroundColor: Colors.black87,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Divider(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+                ],
+              ),
+            ),
+          ),
+
           // ─── Titre section ────────────────────────────────────────────────
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: Text(
                 widget.commerce.type == CommerceType.etablissement
                     ? 'Services proposés'

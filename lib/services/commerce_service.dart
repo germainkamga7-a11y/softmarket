@@ -226,10 +226,11 @@ class CommerceService {
   // initState() et ne JAMAIS l'appeler directement dans build() ou dans le
   // constructeur d'un StreamBuilder — cela créerait une nouvelle connexion
   // réseau à chaque rebuild et provoquerait des freezes Android.
-  Stream<List<Commerce>> streamCommerces() {
+  Stream<List<Commerce>> streamCommerces({int limit = 200}) {
     return _db
         .collection(_collection)
         .orderBy('created_at', descending: true)
+        .limit(limit)
         .snapshots()
         .map((snap) {
           final result = <Commerce>[];

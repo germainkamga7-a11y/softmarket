@@ -1,10 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart' show Share;
 
+import '../services/cart_service.dart';
 import '../services/commerce_service.dart';
+import '../services/mobile_money_service.dart';
 import '../services/report_service.dart';
 import '../theme/app_colors.dart';
 import 'boutique_screen.dart';
+import 'cart_screen.dart';
 import 'chat_screen.dart';
 
 // ─── Fonction globale : ouvrir le détail produit en popup ─────────────────────
@@ -358,63 +363,159 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
             ),
           ),
 
+          // ─── Ajouter au panier ───────────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () {
+                  final cart = context.read<CartService>();
+                  cart.addItem(CartItem(
+                    productId: widget.docId,
+                    nom: widget.nom,
+                    prix: widget.prix,
+                    imageUrl: widget.imageUrls.isNotEmpty
+                        ? widget.imageUrls.first
+                        : null,
+                    commerceId: widget.commerce.id ?? '',
+                    commerceNom: widget.commerce.nomBoutique,
+                  ));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${widget.nom} ajouté au panier'),
+                      duration: const Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                      action: SnackBarAction(
+                        label: 'Voir panier',
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const CartScreen()),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.add_shopping_cart_outlined, size: 18),
+                label: const Text('Ajouter au panier'),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+          ),
+
           // ─── Boutons d'action (fixes en bas) ─────────────────────────────
           Padding(
-            padding: EdgeInsets.fromLTRB(16, 8, 16, MediaQuery.of(context).padding.bottom + 12),
-            child: Row(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, MediaQuery.of(context).padding.bottom + 4),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => BoutiqueScreen(commerce: widget.commerce)),
-                      );
-                    },
-                    icon: Icon(isService ? Icons.business_center_outlined : Icons.storefront_outlined, size: 18),
-                    label: const Text('La boutique'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: accentColor,
-                      side: BorderSide(color: accentColor),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  flex: 2,
-                  child: FilledButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ChatScreen(
-                            otherUserId: widget.commerce.userId,
-                            otherUserName: widget.commerce.nomBoutique,
-                            productRef: {
-                              'id': widget.docId,
-                              'nom': widget.nom,
-                              'prix': widget.prix,
-                              'imageUrl': widget.imageUrls.isNotEmpty
-                                  ? widget.imageUrls.first
-                                  : null,
-                              'categorie': widget.categorie,
-                            },
-                          ),
+                // Rangée 1 : La boutique + Contacter
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => BoutiqueScreen(commerce: widget.commerce)),
+                          );
+                        },
+                        icon: Icon(isService ? Icons.business_center_outlined : Icons.storefront_outlined, size: 18),
+                        label: const Text('La boutique'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: accentColor,
+                          side: BorderSide(color: accentColor),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.chat_bubble_outline, size: 18),
-                    label: const Text('Contacter'),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: accentColor,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      flex: 2,
+                      child: FilledButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ChatScreen(
+                                otherUserId: widget.commerce.userId,
+                                otherUserName: widget.commerce.nomBoutique,
+                                productRef: {
+                                  'id': widget.docId,
+                                  'nom': widget.nom,
+                                  'prix': widget.prix,
+                                  'imageUrl': widget.imageUrls.isNotEmpty
+                                      ? widget.imageUrls.first
+                                      : null,
+                                  'categorie': widget.categorie,
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.chat_bubble_outline, size: 18),
+                        label: const Text('Contacter'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: accentColor,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                // Rangée 2 : Partager + Payer MoMo
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          final imageUrl = widget.imageUrls.isNotEmpty
+                              ? widget.imageUrls.first
+                              : '';
+                          final text = '🛒 ${widget.nom} — '
+                              '${widget.prix.round()} FCFA\n'
+                              'Vendu par ${widget.commerce.nomBoutique} sur CamerMarket'
+                              '${imageUrl.isNotEmpty ? '\n$imageUrl' : ''}';
+                          Share.share(text, subject: widget.nom);
+                        },
+                        icon: const Icon(Icons.share_outlined, size: 18),
+                        label: const Text('Partager'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () => showMobileMoneySheet(
+                          context,
+                          commerce: widget.commerce,
+                          amount: widget.prix,
+                          productName: widget.nom,
+                        ),
+                        icon: const Icon(Icons.mobile_friendly, size: 18),
+                        label: const Text('MoMo'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFFFFB300),
+                          foregroundColor: Colors.black87,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

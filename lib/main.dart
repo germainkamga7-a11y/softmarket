@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:provider/provider.dart';
 
 import 'screens/camer_market_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'firebase_options.dart';
+import 'services/cart_service.dart';
 import 'services/notification_service.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +33,15 @@ void main() async {
     (e) => debugPrint('[Auth] setLanguageCode ignoré : $e'),
   );
 
+  // Crashlytics — actif seulement sur mobile (pas sur web/desktop)
+  if (!kIsWeb) {
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+  }
+
   // Ne pas bloquer runApp() sur l'init des notifications (évite le freeze sur web)
   NotificationService.initialize().catchError(
     (e) => debugPrint('[FCM] Init ignorée : $e'),
@@ -47,6 +60,13 @@ class SoftMarketApp extends StatefulWidget {
 class _SoftMarketAppState extends State<SoftMarketApp> {
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => CartService(),
+      child: _buildApp(),
+    );
+  }
+
+  Widget _buildApp() {
     return MaterialApp(
       title: 'CamerMarket',
       debugShowCheckedModeBanner: false,
@@ -93,6 +113,7 @@ class _SoftMarketAppState extends State<SoftMarketApp> {
       ),
       themeMode: ThemeMode.system,
       scaffoldMessengerKey: scaffoldMessengerKey,
+      navigatorKey: navigatorKey,
       home: const _AuthGate(),
       // Sur desktop web : centrer le contenu dans un cadre mobile (430px max)
       builder: kIsWeb
@@ -114,6 +135,7 @@ class _SoftMarketAppState extends State<SoftMarketApp> {
     );
   }
 }
+
 
 // ─── Routage authentification ────────────────────────────────────────────────
 
@@ -173,10 +195,11 @@ class _SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SizedBox.expand(
+      backgroundColor: const Color(0xFFFF0000),
+      body: Center(
         child: Image.asset(
-          'assets/images/splash_mobile.png',
-          fit: BoxFit.cover,
+          'assets/images/logo.png',
+          width: 160,
         ),
       ),
     );

@@ -29,6 +29,10 @@ class _ChatScreenState extends State<ChatScreen> {
   late final String _convId;
   bool _sending = false;
 
+  // Anti-spam : limite à 1 message par seconde
+  DateTime? _lastSentAt;
+  static const _minInterval = Duration(milliseconds: 1000);
+
   @override
   void initState() {
     super.initState();
@@ -73,6 +77,21 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _sendMessage() async {
     final text = _msgCtrl.text.trim();
     if (text.isEmpty) return;
+
+    // Anti-spam : vérifier le cooldown
+    final now = DateTime.now();
+    if (_lastSentAt != null && now.difference(_lastSentAt!) < _minInterval) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Envoyez vos messages moins rapidement.'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    _lastSentAt = now;
+
     setState(() => _sending = true);
     _msgCtrl.clear();
 

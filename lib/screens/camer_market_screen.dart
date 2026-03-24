@@ -7,12 +7,16 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'package:provider/provider.dart';
+
+import '../services/cart_service.dart';
 import '../services/map_service.dart';
 import '../services/commerce_service.dart';
 import '../services/favorite_service.dart';
 import '../theme/app_colors.dart';
 import 'add_boutique_screen.dart';
 import 'boutique_screen.dart';
+import 'cart_screen.dart';
 import 'chat_screen.dart';
 import 'favorites_screen.dart';
 import 'profile_screen.dart';
@@ -34,6 +38,9 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
   StreamSubscription<Position>? _locationSubscription;
   List<Commerce> _commerces = [];
   bool _loadingCommerces = true; // Indicateur initial de chargement
+  String? _commerceError; // Message d'erreur réseau
+  static const int _commercesLimit = 200;
+
   String? _selectedMapCategory;
   MapType _mapType = MapType.normal;
   LatLng? _userLocation;
@@ -96,28 +103,53 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
     }
   }
 
-  Future<void> _initializeMap() async {
+  Future<void> _initializeMap({bool retry = false}) async {
+    if (retry) {
+      _commerceSubscription?.cancel();
+      if (mounted) setState(() { _loadingCommerces = true; _commerceError = null; });
+    }
+
     try {
       await _mapService.preloadIcons();
     } catch (e) {
       debugPrint('[CamerMarket] preloadIcons ignoré : $e');
     }
-    _commerceSubscription = _commerceService.streamCommerces().listen(
+
+    _commerceSubscription = _commerceService
+        .streamCommerces(limit: _commercesLimit)
+        .listen(
       (commerces) {
         debugPrint('[CamerMarket] ${commerces.length} commerces reçus');
         if (mounted) {
           setState(() {
             _commerces = commerces;
             _loadingCommerces = false;
+            _commerceError = null;
           });
         }
         _updateMapMarkers();
       },
       onError: (e) {
         debugPrint('[CamerMarket] Erreur stream commerces: $e');
-        if (mounted) setState(() => _loadingCommerces = false);
+        if (mounted) {
+          setState(() {
+            _loadingCommerces = false;
+            _commerceError = _isNetworkError(e)
+                ? 'Connexion impossible. Vérifiez votre réseau.'
+                : 'Impossible de charger les commerces.';
+          });
+        }
       },
     );
+  }
+
+  bool _isNetworkError(Object e) {
+    final msg = e.toString().toLowerCase();
+    return msg.contains('network') ||
+        msg.contains('unavailable') ||
+        msg.contains('timeout') ||
+        msg.contains('socket') ||
+        msg.contains('connection');
   }
 
   Future<void> _startLocationStream() async {
@@ -518,6 +550,43 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
               ),
             ),
             actions: [
+              // Icône panier avec badge
+              Consumer<CartService>(
+                builder: (_, cart, __) => Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.shopping_cart_outlined),
+                      color: colorScheme.onPrimary,
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const CartScreen()),
+                      ),
+                    ),
+                    if (cart.itemCount > 0)
+                      Positioned(
+                        top: 6,
+                        right: 6,
+                        child: Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFFB300),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            '${cart.itemCount}',
+                            style: const TextStyle(
+                              fontSize: 9,
+                              color: Colors.black87,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
               IconButton(
                 icon: const Icon(Icons.notifications_outlined),
                 color: colorScheme.onPrimary,
@@ -998,6 +1067,46 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                 ],
               ),
             ),
+
+            // ── Bannière erreur réseau ──
+            if (_commerceError != null)
+              Positioned(
+                top: 210,
+                left: 16,
+                right: 16,
+                child: Material(
+                  color: Colors.transparent,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade700,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [BoxShadow(color: Colors.black38, blurRadius: 6)],
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.wifi_off, color: Colors.white, size: 18),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            _commerceError!,
+                            style: const TextStyle(color: Colors.white, fontSize: 13),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => _initializeMap(retry: true),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                          ),
+                          child: const Text('Réessayer',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
 
             // ── Boutons droite : Ma position 3D + Style carte ──
             Positioned(
