@@ -12,7 +12,6 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   _Step _step = _Step.phone;
-  String _phone = '';
 
   @override
   Widget build(BuildContext context) {
@@ -21,15 +20,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       child: switch (_step) {
         _Step.phone => _PhoneStep(
             key: const ValueKey('forgot_phone'),
-            onContinue: (phone) => setState(() {
-              _phone = phone;
+            onContinue: (_) => setState(() {
               _step = _Step.otp;
             }),
           ),
         _Step.otp => PhoneAuthScreen(
             key: const ValueKey('forgot_otp'),
             isLogin: false,
-            initialPhone: _phone,
             onVerified: () => setState(() => _step = _Step.newPassword),
           ),
         _Step.newPassword => _NewPasswordStep(

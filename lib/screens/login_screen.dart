@@ -1,213 +1,136 @@
 import 'package:flutter/material.dart';
 
-import '../services/auth_service.dart';
-import 'camer_market_screen.dart';
-import 'forgot_password_screen.dart';
-import 'register_screen.dart';
+import 'phone_auth_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
-
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final _phoneCtrl = TextEditingController(text: '+237 ');
-  final _passwordCtrl = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
-  bool _loading = false;
-  bool _obscure = true;
-  String? _error;
-
-  @override
-  void dispose() {
-    _phoneCtrl.dispose();
-    _passwordCtrl.dispose();
-    super.dispose();
-  }
-
-  Future<void> _signIn() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-
-    final error = await AuthService.signInWithPhone(
-      _phoneCtrl.text.trim(),
-      _passwordCtrl.text,
-    );
-    if (!mounted) return;
-    if (error == null) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const CamerMarketScreen()),
-        (route) => false,
-      );
-      return;
-    }
-
-    setState(() {
-      _loading = false;
-      _error = error;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Form(
-            key: _formKey,
+      body: Stack(
+        children: [
+          // ── Fond dégradé rouge ────────────────────────────────────────────
+          Container(
+            height: size.height * 0.50,
+            decoration: const BoxDecoration(
+              gradient: RadialGradient(
+                center: Alignment.topCenter,
+                radius: 1.4,
+                colors: [
+                  Color(0xFFCC0000),
+                  Color(0xFF6B0000),
+                  Color(0xFF1A0000),
+                ],
+                stops: [0.0, 0.55, 1.0],
+              ),
+            ),
+          ),
+
+          SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 24),
-                Center(
-                  child: Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.login, size: 36, color: colorScheme.primary),
+                // ── Section haute (logo + tagline) ────────────────────────
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/logo.png',
+                        width: size.width * 0.55,
+                        height: size.height * 0.22,
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'LE MARCHÉ DIGITAL DU CAMEROUN',
+                        textAlign: TextAlign.center,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: const Color(0xFFFFB300),
+                          letterSpacing: 2,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  'Se connecter',
-                  textAlign: TextAlign.center,
-                  style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Entrez votre numéro et mot de passe',
-                  textAlign: TextAlign.center,
-                  style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-                ),
-                const SizedBox(height: 40),
-                if (_error != null) ...[
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: colorScheme.errorContainer,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.error_outline, color: colorScheme.onErrorContainer),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            _error!,
-                            style: TextStyle(color: colorScheme.onErrorContainer),
+
+                // ── Section basse (boutons) ───────────────────────────────
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(32)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.08),
+                        blurRadius: 20,
+                        offset: const Offset(0, -4),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.fromLTRB(28, 28, 28, 28),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Bienvenue !',
+                        style: textTheme.headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Achetez, vendez et échangez avec des\ncommerçants vérifiés près de chez vous.',
+                        style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant),
+                      ),
+                      const SizedBox(height: 28),
+
+                      // ── Bouton téléphone (principal) ──────────────────
+                      SizedBox(
+                        height: 52,
+                        child: FilledButton.icon(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const PhoneAuthScreen(),
+                            ),
+                          ),
+                          icon: const Icon(Icons.phone_outlined),
+                          label: const Text('Continuer avec un numéro'),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: const Color(0xFFCC0000),
+                            foregroundColor: Colors.white,
+                            textStyle: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w600),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
                           ),
                         ),
-                        IconButton(
-                          icon: Icon(Icons.close, color: colorScheme.onErrorContainer, size: 18),
-                          onPressed: () => setState(() => _error = null),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-                TextFormField(
-                  controller: _phoneCtrl,
-                  keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
-                    labelText: 'Numéro de téléphone',
-                    hintText: '+237 6XX XXX XXX',
-                    prefixIcon: const Icon(Icons.phone_outlined),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    filled: true,
-                    fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                  ),
-                  validator: (v) {
-                    if (v == null || v.replaceAll(' ', '').length < 12) {
-                      return 'Numéro invalide (ex: +237 6XX XXX XXX)';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _passwordCtrl,
-                  obscureText: _obscure,
-                  decoration: InputDecoration(
-                    labelText: 'Mot de passe',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined),
-                      onPressed: () => setState(() => _obscure = !_obscure),
-                    ),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    filled: true,
-                    fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                  ),
-                  validator: (v) {
-                    if (v == null || v.length < 6) return 'Minimum 6 caractères';
-                    return null;
-                  },
-                  onFieldSubmitted: (_) => _signIn(),
-                ),
-                const SizedBox(height: 4),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
-                    ),
-                    child: const Text('Mot de passe oublié ?'),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: _loading ? null : _signIn,
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: _loading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                        )
-                      : const Text(
-                          'Se connecter',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Pas encore de compte ?',
-                      style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (_) => const RegisterScreen()),
                       ),
-                      child: const Text('Créer un compte'),
-                    ),
-                  ],
+
+                      const SizedBox(height: 20),
+                      Center(
+                        child: Text(
+                          'Transactions sécurisées · Commerçants géolocalisés',
+                          textAlign: TextAlign.center,
+                          style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }

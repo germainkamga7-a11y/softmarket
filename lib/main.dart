@@ -9,8 +9,8 @@ import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'screens/camer_market_screen.dart';
+import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
-import 'screens/welcome_screen.dart';
 import 'firebase_options.dart';
 import 'services/cart_service.dart';
 import 'services/notification_service.dart';
@@ -184,7 +184,7 @@ class _AuthGateState extends State<_AuthGate> {
         // Vérification stream + fallback synchrone (currentUser)
         final user = snap.data ?? FirebaseAuth.instance.currentUser;
         if (user != null) return _ProfileCheck(uid: user.uid);
-        return const WelcomeScreen();
+        return const LoginScreen();
       },
     );
   }
@@ -211,7 +211,7 @@ class _ProfileCheck extends StatelessWidget {
         // Profil absent → l'utilisateur est authentifié mais n'a pas
         // terminé son inscription (ex: auto-vérif Android). On reprend
         // l'inscription à l'étape mot de passe.
-        return const RegisterScreen(startFromPasswordStep: true);
+        return const RegisterScreen();
       },
     );
   }
