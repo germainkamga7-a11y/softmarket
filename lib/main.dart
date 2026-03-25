@@ -6,7 +6,10 @@ import 'package:flutter/foundation.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'screens/camer_market_screen.dart';
+import 'screens/register_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'firebase_options.dart';
 import 'services/cart_service.dart';
@@ -180,8 +183,35 @@ class _AuthGateState extends State<_AuthGate> {
 
         // Vérification stream + fallback synchrone (currentUser)
         final user = snap.data ?? FirebaseAuth.instance.currentUser;
-        if (user != null) return const CamerMarketScreen();
+        if (user != null) return _ProfileCheck(uid: user.uid);
         return const WelcomeScreen();
+      },
+    );
+  }
+}
+
+// ─── Vérification profil Firestore ───────────────────────────────────────────
+// Évite que _AuthGate navigue vers CamerMarketScreen si le profil n'existe pas
+// encore (ex: auto-vérification Android avant fin de l'inscription).
+
+class _ProfileCheck extends StatelessWidget {
+  final String uid;
+  const _ProfileCheck({required this.uid});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .snapshots(),
+      builder: (context, snap) {
+        if (!snap.hasData) return const _SplashScreen();
+        if (snap.data!.exists) return const CamerMarketScreen();
+        // Profil absent → l'utilisateur est authentifié mais n'a pas
+        // terminé son inscription (ex: auto-vérif Android). On reprend
+        // l'inscription à l'étape mot de passe.
+        return const RegisterScreen(startFromPasswordStep: true);
       },
     );
   }

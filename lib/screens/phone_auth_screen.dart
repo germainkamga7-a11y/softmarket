@@ -2,8 +2,6 @@ import 'package:flutter/foundation.dart' show kIsWeb, TargetPlatform, defaultTar
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'camer_market_screen.dart';
-
 class PhoneAuthScreen extends StatefulWidget {
   final bool isLogin;
   final VoidCallback? onVerified;
@@ -132,15 +130,15 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         );
         await _auth.signInWithCredential(credential);
       }
+      if (!mounted) return;
       if (widget.onVerified != null) {
         widget.onVerified!();
         return;
       }
-      if (!mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const CamerMarketScreen()),
-        (route) => false,
-      );
+      // Pour le login : _AuthGate détecte le changement d'état Firebase
+      // et navigue automatiquement. Pas besoin de naviguer manuellement
+      // (double navigation → conflit sur Android).
+      setState(() => _loading = false);
     } on FirebaseAuthException catch (e) {
       setState(() {
         _loading = false;

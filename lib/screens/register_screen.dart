@@ -13,7 +13,11 @@ import 'phone_auth_screen.dart';
 import 'privacy_policy_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  /// Si true, démarre directement à l'étape mot de passe (l'OTP a déjà été
+  /// validé, par exemple via auto-vérification Android).
+  final bool startFromPasswordStep;
+
+  const RegisterScreen({super.key, this.startFromPasswordStep = false});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -21,7 +25,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   // Étapes : otp → password → profile
-  _Step _step = _Step.otp;
+  late _Step _step;
 
   // Mot de passe
   final _passwordCtrl = TextEditingController();
@@ -44,6 +48,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     'Kribi', 'Limbe', 'Autre',
   ];
   String _villeSelected = 'Yaoundé';
+
+  @override
+  void initState() {
+    super.initState();
+    _step = widget.startFromPasswordStep ? _Step.password : _Step.otp;
+  }
 
   @override
   void dispose() {
