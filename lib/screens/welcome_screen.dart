@@ -104,7 +104,7 @@ class WelcomeScreen extends StatelessWidget {
                         const SizedBox(height: 32),
 
                         FilledButton.icon(
-                          onPressed: () => context.push(Routes.register),
+                          onPressed: () => context.push(Routes.phoneAuth),
                           icon: const Icon(Icons.person_add_outlined),
                           label: Text(l.createAccount),
                           style: FilledButton.styleFrom(

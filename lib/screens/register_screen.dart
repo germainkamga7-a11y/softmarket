@@ -79,6 +79,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             const Duration(seconds: 10),
             onTimeout: () => throw TimeoutException('timeout'),
           );
+      if (mounted) context.go(Routes.home);
     } on TimeoutException {
       if (mounted) {
         setState(() => _saving = false);

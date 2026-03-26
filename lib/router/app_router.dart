@@ -97,7 +97,7 @@ class AppRouter {
   String? _redirect(BuildContext context, GoRouterState state) {
     final location = state.matchedLocation;
 
-    // Routes publiques (accessibles sans être connecté)
+    // Routes accessibles sans être connecté
     final isPublic = location == Routes.welcome ||
         location == Routes.login ||
         location == Routes.phoneAuth ||
@@ -105,12 +105,18 @@ class AppRouter {
         location == Routes.cgu ||
         location == Routes.privacy;
 
+    // Routes d'auth pures (à quitter dès qu'on est connecté)
+    final isAuthRoute = location == Routes.welcome ||
+        location == Routes.login ||
+        location == Routes.phoneAuth;
+
     if (!_auth.isLoggedIn) {
       return isPublic ? null : Routes.login;
     }
 
-    // Connecté mais sur une route d'auth → redirige vers home
-    if (isPublic) return Routes.home;
+    // Connecté mais sur une route d'auth pure → redirige vers home
+    // /register reste accessible aux utilisateurs connectés sans profil
+    if (isAuthRoute) return Routes.home;
 
     return null;
   }
