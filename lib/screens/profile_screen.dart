@@ -9,6 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+import 'package:provider/provider.dart';
+
+import '../providers/auth_provider.dart';
 import '../services/commerce_service.dart';
 import 'add_boutique_screen.dart';
 import 'boutique_screen.dart';
@@ -150,7 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
     if (confirm != true || !mounted) return;
-    await FirebaseAuth.instance.signOut();
+    await context.read<AppAuthProvider>().signOut();
     if (mounted) {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const WelcomeScreen()),

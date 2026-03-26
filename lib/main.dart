@@ -12,6 +12,7 @@ import 'screens/camer_market_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'firebase_options.dart';
+import 'providers/auth_provider.dart';
 import 'services/analytics_service.dart';
 import 'services/cart_service.dart';
 import 'services/notification_service.dart';
@@ -70,8 +71,11 @@ class SoftMarketApp extends StatefulWidget {
 class _SoftMarketAppState extends State<SoftMarketApp> {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => CartService(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppAuthProvider()),
+        ChangeNotifierProvider(create: (_) => CartService()),
+      ],
       child: _buildApp(),
     );
   }
@@ -182,16 +186,12 @@ class _AuthGate extends StatefulWidget {
 }
 
 class _AuthGateState extends State<_AuthGate> {
-  late final Stream<User?> _authStream;
-  // Fallback indépendant du stream : force la sortie du splash après N secondes
-  // même si Firebase ne répond pas (iOS Safari, réseau lent, etc.)
+  // Fallback : force la sortie du splash après N secondes si Firebase est lent
   bool _timedOut = false;
 
   @override
   void initState() {
     super.initState();
-    _authStream = FirebaseAuth.instance.authStateChanges();
-
     const timeoutDuration =
         kIsWeb ? Duration(seconds: 6) : Duration(seconds: 12);
     Future.delayed(timeoutDuration, () {
@@ -201,24 +201,15 @@ class _AuthGateState extends State<_AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: _authStream,
-      builder: (context, snap) {
-        if (snap.hasError) {
-          debugPrint('[AuthGate] Erreur stream auth : ${snap.error}');
-        }
+    final auth = context.watch<AppAuthProvider>();
 
-        // Splash seulement si on attend encore ET que le timeout n'a pas expiré
-        final isWaiting =
-            snap.connectionState == ConnectionState.waiting && !_timedOut;
-        if (isWaiting) return const _SplashScreen();
+    // Splash tant qu'on n'a pas de réponse ET que le timeout n'a pas expiré
+    if (!auth.isLoggedIn && !_timedOut && FirebaseAuth.instance.currentUser == null) {
+      return const _SplashScreen();
+    }
 
-        // Vérification stream + fallback synchrone (currentUser)
-        final user = snap.data ?? FirebaseAuth.instance.currentUser;
-        if (user != null) return _ProfileCheck(uid: user.uid);
-        return const LoginScreen();
-      },
-    );
+    if (auth.isLoggedIn) return _ProfileCheck(uid: auth.uid!);
+    return const LoginScreen();
   }
 }
 

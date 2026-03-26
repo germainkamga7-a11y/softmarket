@@ -9,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:provider/provider.dart';
 
+import '../providers/auth_provider.dart';
 import '../services/cart_service.dart';
 import '../services/map_service.dart';
 import '../services/commerce_service.dart';
@@ -282,12 +283,12 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final isAnonymous = FirebaseAuth.instance.currentUser?.isAnonymous ?? false;
+    final authProvider = context.watch<AppAuthProvider>();
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       // Bandeau visiteur anonyme
-      bottomSheet: isAnonymous
+      bottomSheet: authProvider.isAnonymous
           ? _AnonBanner()
           : null,
       body: IndexedStack(
