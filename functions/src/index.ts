@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import { onDocumentCreated, onDocumentUpdated } from "firebase-functions/v2/firestore";
 import { setGlobalOptions } from "firebase-functions/v2";
 
 admin.initializeApp();
@@ -143,6 +143,162 @@ export const onNewProduct = onDocumentCreated(
         },
         android: { priority: "normal" },
       });
+    }
+  }
+);
+
+// ─── Notification : nouvelle commande → vendeur ───────────────────────────────
+
+export const onNewOrder = onDocumentCreated(
+  "commandes/{commandeId}",
+  async (event) => {
+    const order = event.data?.data();
+    if (!order) return;
+
+    const commandeId: string = event.params.commandeId;
+    const buyerId: string = order.userId;
+    const total: number = order.total ?? 0;
+    const items: Array<{ commerceId: string; commerceNom: string; nom: string }> =
+      order.items ?? [];
+
+    if (items.length === 0) return;
+
+    // Grouper par commerceId pour notifier chaque vendeur une seule fois
+    const commerceIds = [...new Set(items.map((i) => i.commerceId))];
+
+    // Récupérer le nom de l'acheteur
+    const buyerDoc = await db.collection("users").doc(buyerId).get();
+    const buyerName: string = buyerDoc.data()?.username ?? "Un client";
+
+    for (const commerceId of commerceIds) {
+      // Récupérer le commerçant
+      const commerceDoc = await db.collection("commercants").doc(commerceId).get();
+      if (!commerceDoc.exists) continue;
+
+      const sellerId: string = commerceDoc.data()?.user_id;
+      if (!sellerId || sellerId === buyerId) continue;
+
+      // Token FCM du vendeur
+      const sellerDoc = await db.collection("users").doc(sellerId).get();
+      const fcmToken: string | undefined = sellerDoc.data()?.fcm_token;
+      if (!fcmToken) continue;
+
+      const nomBoutique: string = commerceDoc.data()?.nom_boutique ?? "votre boutique";
+      const itemCount = items.filter((i) => i.commerceId === commerceId).length;
+      const body = `${buyerName} — ${itemCount} article${itemCount > 1 ? "s" : ""} · ${total.toFixed(0)} FCFA`;
+
+      try {
+        await messaging.send({
+          token: fcmToken,
+          notification: {
+            title: `🛒 Nouvelle commande sur ${nomBoutique}`,
+            body,
+          },
+          data: {
+            type: "order",
+            order_id: commandeId,
+            commerce_id: commerceId,
+            click_action: "FLUTTER_NOTIFICATION_CLICK",
+          },
+          android: {
+            priority: "high",
+            notification: {
+              channelId: "orders",
+              sound: "default",
+              priority: "high",
+            },
+          },
+          apns: {
+            payload: { aps: { sound: "default", badge: 1 } },
+          },
+        });
+      } catch (err: unknown) {
+        const firebaseErr = err as { code?: string };
+        if (
+          firebaseErr.code === "messaging/registration-token-not-registered" ||
+          firebaseErr.code === "messaging/invalid-registration-token"
+        ) {
+          await db.collection("users").doc(sellerId).update({
+            fcm_token: admin.firestore.FieldValue.delete(),
+          });
+        }
+      }
+    }
+  }
+);
+
+// ─── Notification : changement de statut commande → acheteur ─────────────────
+
+const STATUS_LABELS: Record<string, string> = {
+  confirmee:    "✅ Commande confirmée",
+  en_livraison: "🚚 En cours de livraison",
+  livree:       "📦 Commande livrée !",
+  annulee:      "❌ Commande annulée",
+};
+
+export const onOrderStatusChanged = onDocumentUpdated(
+  "commandes/{commandeId}",
+  async (event) => {
+    const before = event.data?.before.data();
+    const after  = event.data?.after.data();
+    if (!before || !after) return;
+
+    const oldStatut: string = before.statut;
+    const newStatut: string = after.statut;
+
+    // Ne déclencher que si le statut a réellement changé
+    if (oldStatut === newStatut) return;
+
+    const label = STATUS_LABELS[newStatut];
+    if (!label) return;
+
+    const buyerId: string = after.userId;
+    const commandeId: string = event.params.commandeId;
+    const total: number = after.total ?? 0;
+
+    // Token FCM de l'acheteur
+    const buyerDoc = await db.collection("users").doc(buyerId).get();
+    const fcmToken: string | undefined = buyerDoc.data()?.fcm_token;
+    if (!fcmToken) return;
+
+    const items: Array<{ nom: string }> = after.items ?? [];
+    const firstItem = items[0]?.nom ?? "votre commande";
+
+    try {
+      await messaging.send({
+        token: fcmToken,
+        notification: {
+          title: label,
+          body: `${firstItem}${items.length > 1 ? ` +${items.length - 1} autre(s)` : ""} · ${total.toFixed(0)} FCFA`,
+        },
+        data: {
+          type: "order_status",
+          order_id: commandeId,
+          statut: newStatut,
+          click_action: "FLUTTER_NOTIFICATION_CLICK",
+        },
+        android: {
+          priority: "high",
+          notification: {
+            channelId: "orders",
+            sound: "default",
+            priority: "high",
+          },
+        },
+        apns: {
+          payload: { aps: { sound: "default", badge: 1 } },
+        },
+      });
+    } catch (err: unknown) {
+      const firebaseErr = err as { code?: string };
+      if (
+        firebaseErr.code === "messaging/registration-token-not-registered" ||
+        firebaseErr.code === "messaging/invalid-registration-token"
+      ) {
+        await db.collection("users").doc(buyerId).update({
+          fcm_token: admin.firestore.FieldValue.delete(),
+        });
+      }
     }
   }
 );

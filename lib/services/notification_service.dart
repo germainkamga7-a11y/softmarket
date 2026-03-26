@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../main.dart' show navigatorKey, scaffoldMessengerKey;
 import '../screens/chat_screen.dart';
+import '../screens/order_tracking_screen.dart';
 
 bool get _isDesktopNative =>
     !kIsWeb &&
@@ -215,6 +216,14 @@ class NotificationService {
             otherUserId: senderId,
             otherUserName: senderName,
           ),
+        ),
+      );
+    } else if (type == 'order' || type == 'order_status') {
+      final orderId = data['order_id'] as String?;
+      if (orderId == null) return;
+      navigatorKey.currentState?.push(
+        MaterialPageRoute(
+          builder: (_) => OrderTrackingScreen(orderId: orderId),
         ),
       );
     }
