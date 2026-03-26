@@ -17,8 +17,8 @@ dependencies:
   material_symbols_icons: ^4.2719.3
 
   # Google Maps
-  google_maps_flutter: ^2.5.3
-  google_maps_flutter_web: ^0.5.4
+  google_maps_flutter: ^2.16.0
+  google_maps_flutter_web: ^0.6.2
 
   # Firebase
   firebase_core: ^3.6.0
