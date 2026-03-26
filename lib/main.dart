@@ -3,8 +3,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
+
+import 'l10n/app_localizations.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -163,6 +166,13 @@ class _SoftMarketAppState extends State<SoftMarketApp> {
         ),
       ),
       themeMode: ThemeMode.system,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
       scaffoldMessengerKey: scaffoldMessengerKey,
       routerConfig: _appRouter.router,
       // Sur desktop web : centrer le contenu dans un cadre mobile (430px max)

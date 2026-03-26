@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import 'cgu_screen.dart';
-import 'privacy_policy_screen.dart';
+import '../l10n/app_localizations.dart';
+import '../router/app_router.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -34,29 +35,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _pickDate() async {
+    final l = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
       initialDate: DateTime(now.year - 20),
       firstDate: DateTime(1920),
       lastDate: DateTime(now.year - 10),
-      helpText: 'Date de naissance',
+      helpText: l.birthDateLabel,
     );
     if (picked != null) setState(() => _dateNaissance = picked);
   }
 
   Future<void> _saveProfile() async {
+    final l = AppLocalizations.of(context)!;
     if (_nomCtrl.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Veuillez entrer votre nom d\'utilisateur')),
+        SnackBar(content: Text(l.usernameRequired)),
       );
       return;
     }
     if (_dateNaissance == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Veuillez entrer votre date de naissance')),
+        SnackBar(content: Text(l.birthDateRequired)),
       );
       return;
     }
@@ -78,17 +79,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
             const Duration(seconds: 10),
             onTimeout: () => throw TimeoutException('timeout'),
           );
-      // Pas de navigation manuelle — _ProfileCheck dans main.dart détecte
-      // l'apparition du document et navigue vers CamerMarketScreen.
     } on TimeoutException {
       if (mounted) {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-                'Réseau lent. Vérifiez votre connexion et réessayez.'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.slowNetwork),
             backgroundColor: Colors.orange,
-            duration: Duration(seconds: 4),
+            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -97,7 +95,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur : $e'),
+            content: Text('${AppLocalizations.of(context)!.error} : $e'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 5),
           ),
@@ -108,6 +106,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -119,7 +118,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () async {
             await FirebaseAuth.instance.signOut();
-            // _AuthGate détecte la déconnexion et revient sur LoginScreen
           },
         ),
       ),
@@ -144,14 +142,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                'Votre profil',
+                l.registerTitle,
                 textAlign: TextAlign.center,
                 style: textTheme.headlineSmall
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
-                'Ces informations seront visibles\npar les autres utilisateurs',
+                l.registerSubtitle,
                 textAlign: TextAlign.center,
                 style: textTheme.bodyMedium
                     ?.copyWith(color: colorScheme.onSurfaceVariant),
@@ -162,8 +160,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: _nomCtrl,
                 textCapitalization: TextCapitalization.words,
                 decoration: InputDecoration(
-                  labelText: 'Nom d\'utilisateur',
-                  hintText: 'Ex: jeankamga',
+                  labelText: l.usernameLabel,
+                  hintText: l.usernameHint,
                   prefixIcon: const Icon(Icons.person_outline),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12)),
@@ -177,9 +175,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               DropdownButtonFormField<String>(
                 initialValue: _villeSelected,
                 decoration: InputDecoration(
-                  labelText: 'Ville',
-                  prefixIcon:
-                      const Icon(Icons.location_city_outlined),
+                  labelText: l.cityLabel,
+                  prefixIcon: const Icon(Icons.location_city_outlined),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12)),
                   filled: true,
@@ -199,7 +196,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 borderRadius: BorderRadius.circular(12),
                 child: InputDecorator(
                   decoration: InputDecoration(
-                    labelText: 'Date de naissance',
+                    labelText: l.birthDateLabel,
                     prefixIcon: const Icon(Icons.cake_outlined),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12)),
@@ -209,9 +206,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   child: Text(
                     _dateNaissance != null
-                        ? DateFormat('dd/MM/yyyy')
-                            .format(_dateNaissance!)
-                        : 'Sélectionner une date',
+                        ? DateFormat('dd/MM/yyyy').format(_dateNaissance!)
+                        : l.selectDate,
                     style: TextStyle(
                       color: _dateNaissance != null
                           ? colorScheme.onSurface
@@ -222,7 +218,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 28),
 
-              // CGU (requis Play Store)
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Text.rich(
@@ -231,18 +226,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         fontSize: 12,
                         color: colorScheme.onSurfaceVariant),
                     children: [
-                      const TextSpan(
-                          text:
-                              'En terminant votre inscription, vous acceptez nos '),
+                      TextSpan(text: l.termsPrefix),
                       WidgetSpan(
                         child: GestureDetector(
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const CguScreen()),
-                          ),
+                          onTap: () => context.push(Routes.cgu),
                           child: Text(
-                            "Conditions d'utilisation",
+                            l.cguTitle,
                             style: TextStyle(
                               fontSize: 12,
                               color: colorScheme.primary,
@@ -251,17 +240,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                       ),
-                      const TextSpan(text: ' et notre '),
+                      TextSpan(text: l.termsAnd),
                       WidgetSpan(
                         child: GestureDetector(
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) =>
-                                    const PrivacyPolicyScreen()),
-                          ),
+                          onTap: () => context.push(Routes.privacy),
                           child: Text(
-                            'Politique de confidentialité',
+                            l.privacyTitle,
                             style: TextStyle(
                               fontSize: 12,
                               color: colorScheme.primary,
@@ -291,9 +275,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: Colors.white),
                       )
-                    : const Text(
-                        "Terminer l'inscription",
-                        style: TextStyle(
+                    : Text(
+                        l.finishRegistration,
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600),
                       ),
               ),

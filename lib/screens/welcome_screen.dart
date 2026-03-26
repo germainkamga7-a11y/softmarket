@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../l10n/app_localizations.dart';
 import '../router/app_router.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -8,6 +9,7 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final size = MediaQuery.of(context).size;
@@ -37,7 +39,6 @@ class WelcomeScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Logo CamerMarket
                       Image.asset(
                         'assets/images/logo.png',
                         width: size.width * 0.55,
@@ -46,7 +47,7 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'LE MARCHÉ DIGITAL DU CAMEROUN',
+                        l.appTagline,
                         textAlign: TextAlign.center,
                         style: textTheme.bodySmall?.copyWith(
                           color: const Color(0xFFFFB300),
@@ -55,15 +56,14 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      // Stats
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _StatBadge(icon: Icons.shopping_cart_outlined, label: 'Acheter'),
-                          SizedBox(width: 24),
-                          _StatBadge(icon: Icons.storefront, label: 'Vendre'),
-                          SizedBox(width: 24),
-                          _StatBadge(icon: Icons.local_shipping_outlined, label: 'Livrer'),
+                          _StatBadge(icon: Icons.shopping_cart_outlined, label: l.buy),
+                          const SizedBox(width: 24),
+                          _StatBadge(icon: Icons.storefront, label: l.sell),
+                          const SizedBox(width: 24),
+                          _StatBadge(icon: Icons.local_shipping_outlined, label: l.deliver),
                         ],
                       ),
                     ],
@@ -91,23 +91,22 @@ class WelcomeScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          'Bienvenue !',
+                          l.welcome,
                           style: textTheme.headlineSmall
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Achetez, vendez et échangez avec des\ncommerçants vérifiés près de chez vous.',
+                          l.welcomeSubtitle,
                           style: textTheme.bodyMedium?.copyWith(
                               color: colorScheme.onSurfaceVariant),
                         ),
                         const SizedBox(height: 32),
 
-                        // Bouton S'inscrire
                         FilledButton.icon(
                           onPressed: () => context.push(Routes.register),
                           icon: const Icon(Icons.person_add_outlined),
-                          label: const Text('Créer un compte'),
+                          label: Text(l.createAccount),
                           style: FilledButton.styleFrom(
                             backgroundColor: const Color(0xFFCC0000),
                             foregroundColor: Colors.white,
@@ -118,11 +117,10 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
 
-                        // Bouton Se connecter
                         OutlinedButton.icon(
                           onPressed: () => context.push(Routes.login),
                           icon: const Icon(Icons.login),
-                          label: const Text('Se connecter'),
+                          label: Text(l.signIn),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xFFCC0000),
                             side: const BorderSide(color: Color(0xFFCC0000), width: 1.5),
@@ -135,7 +133,7 @@ class WelcomeScreen extends StatelessWidget {
                         const Spacer(),
                         Center(
                           child: Text(
-                            'Transactions sécurisées · Commerçants géolocalisés',
+                            l.securityNote,
                             style: textTheme.bodySmall?.copyWith(
                                 color: colorScheme.onSurfaceVariant),
                           ),

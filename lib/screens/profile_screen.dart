@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../router/app_router.dart';
 import '../services/commerce_service.dart';
@@ -98,21 +99,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // ─── Supprimer commerce ───────────────────────────────────────────────────
 
   Future<void> _deleteCommerce(Commerce commerce) async {
+    final l = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Supprimer ?'),
+        title: Text(l.delete),
         content: Text(
             'Supprimer "${commerce.nomBoutique}" définitivement ?\nCette action est irréversible.'),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Annuler')),
+              child: Text(l.cancel)),
           FilledButton(
             style:
                 FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Supprimer'),
+            child: Text(l.delete),
           ),
         ],
       ),
@@ -121,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await CommerceService().deleteCommerce(commerce.id!);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Commerce supprimé')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.commerceDeleted)),
       );
     }
   }
@@ -129,19 +131,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // ─── Déconnexion ──────────────────────────────────────────────────────────
 
   Future<void> _logout() async {
+    final l = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Déconnexion'),
-        content:
-            const Text('Voulez-vous vraiment vous déconnecter ?'),
+        title: Text(l.signOutDialogTitle),
+        content: Text(l.signOutMessage),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Annuler')),
+              child: Text(l.cancel)),
           TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Déconnecter')),
+              child: Text(l.confirm)),
         ],
       ),
     );
@@ -152,6 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -301,14 +304,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         _InfoTile(
                           icon: Icons.location_city_outlined,
-                          label: 'Ville',
-                          value: ville.isEmpty ? 'Non renseignée' : ville,
+                          label: l.cityLabel,
+                          value: ville.isEmpty ? l.notProvided : ville,
                         ),
                         if (createdAt != null) ...[
                           Divider(height: 1, indent: 56, color: colorScheme.outlineVariant),
                           _InfoTile(
                             icon: Icons.calendar_today_outlined,
-                            label: 'Membre depuis',
+                            label: l.memberSince,
                             value: DateFormat('MMMM yyyy', 'fr_FR').format(createdAt),
                           ),
                         ],
@@ -323,13 +326,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Mes boutiques & établissements',
+                          l.myShops,
                           style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         TextButton.icon(
                           onPressed: () => context.push(Routes.addBoutique),
                           icon: const Icon(Icons.add, size: 18),
-                          label: const Text('Créer'),
+                          label: Text(l.create),
                         ),
                       ],
                     ),
@@ -361,7 +364,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
-                                      'Impossible de charger les boutiques',
+                                      l.loadShopsError,
                                       style: TextStyle(color: colorScheme.error),
                                     ),
                                   ),
@@ -388,10 +391,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Icon(Icons.storefront_outlined,
                                       size: 48, color: colorScheme.outlineVariant),
                                   const SizedBox(height: 12),
-                                  Text('Aucune boutique', style: textTheme.titleSmall),
+                                  Text(l.noShop, style: textTheme.titleSmall),
                                   const SizedBox(height: 6),
                                   Text(
-                                    'Créez votre première boutique ou établissement',
+                                    l.noShopSubtitle,
                                     textAlign: TextAlign.center,
                                     style: textTheme.bodySmall
                                         ?.copyWith(color: colorScheme.onSurfaceVariant),
@@ -421,7 +424,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // ─── Paramètres ───────────────────────────────────
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-                    child: Text('Paramètres',
+                    child: Text(l.settings,
                         style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                   ),
                   Padding(
@@ -436,7 +439,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           ListTile(
                             leading: Icon(Icons.chat_outlined, color: colorScheme.primary),
-                            title: const Text('Messages'),
+                            title: Text(l.messages),
                             trailing: const Icon(Icons.chevron_right),
                             onTap: () => context.push(Routes.conversations),
                             shape: const RoundedRectangleBorder(
@@ -445,35 +448,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Divider(height: 1, indent: 56, color: colorScheme.outlineVariant),
                           ListTile(
                             leading: Icon(Icons.receipt_long_outlined, color: colorScheme.primary),
-                            title: const Text('Mes commandes'),
+                            title: Text(l.myOrders),
                             trailing: const Icon(Icons.chevron_right),
                             onTap: () => context.push(Routes.orders),
                           ),
                           Divider(height: 1, indent: 56, color: colorScheme.outlineVariant),
                           ListTile(
                             leading: Icon(Icons.notifications_outlined, color: colorScheme.primary),
-                            title: const Text('Notifications'),
+                            title: Text(l.notifications),
                             trailing: const Icon(Icons.chevron_right),
                             onTap: () => context.push(Routes.notifications),
                           ),
                           Divider(height: 1, indent: 56, color: colorScheme.outlineVariant),
                           ListTile(
                             leading: Icon(Icons.security_outlined, color: colorScheme.primary),
-                            title: const Text('Sécurité & PIN'),
+                            title: Text(l.securityPin),
                             trailing: const Icon(Icons.chevron_right),
                             onTap: () => context.push(Routes.security),
                           ),
                           Divider(height: 1, indent: 56, color: colorScheme.outlineVariant),
                           ListTile(
                             leading: Icon(Icons.privacy_tip_outlined, color: colorScheme.primary),
-                            title: const Text('Politique de confidentialité'),
+                            title: Text(l.privacyPolicy),
                             trailing: const Icon(Icons.chevron_right),
                             onTap: () => context.push(Routes.privacy),
                           ),
                           Divider(height: 1, indent: 56, color: colorScheme.outlineVariant),
                           ListTile(
                             leading: Icon(Icons.help_outline, color: colorScheme.primary),
-                            title: const Text('Aide & Support'),
+                            title: Text(l.helpSupport),
                             trailing: const Icon(Icons.chevron_right),
                             onTap: () => context.push(Routes.help),
                             shape: const RoundedRectangleBorder(
@@ -490,7 +493,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: OutlinedButton.icon(
                       onPressed: _logout,
                       icon: Icon(Icons.logout, color: colorScheme.error),
-                      label: Text('Se déconnecter',
+                      label: Text(l.signOutButton,
                           style: TextStyle(color: colorScheme.error)),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -657,34 +660,37 @@ class _BoutiqueListTile extends StatelessWidget {
                   if (v == 'delete') onDelete();
                   if (v == 'visit') onVisit();
                 },
-                itemBuilder: (_) => [
-                  const PopupMenuItem(
-                    value: 'visit',
-                    child: Row(children: [
-                      Icon(Icons.visibility_outlined, size: 18),
-                      SizedBox(width: 8),
-                      Text('Voir la boutique'),
-                    ]),
-                  ),
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: Row(children: [
-                      Icon(Icons.edit_outlined, size: 18),
-                      SizedBox(width: 8),
-                      Text('Modifier'),
-                    ]),
-                  ),
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: Row(children: [
-                      Icon(Icons.delete_outline,
-                          size: 18, color: Colors.red),
-                      SizedBox(width: 8),
-                      Text('Supprimer',
-                          style: TextStyle(color: Colors.red)),
-                    ]),
-                  ),
-                ],
+                itemBuilder: (ctx) {
+                  final l = AppLocalizations.of(ctx)!;
+                  return [
+                    PopupMenuItem(
+                      value: 'visit',
+                      child: Row(children: [
+                        const Icon(Icons.visibility_outlined, size: 18),
+                        const SizedBox(width: 8),
+                        Text(l.visitShop),
+                      ]),
+                    ),
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Row(children: [
+                        const Icon(Icons.edit_outlined, size: 18),
+                        const SizedBox(width: 8),
+                        Text(l.edit),
+                      ]),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(children: [
+                        const Icon(Icons.delete_outline,
+                            size: 18, color: Colors.red),
+                        const SizedBox(width: 8),
+                        Text(l.delete,
+                            style: const TextStyle(color: Colors.red)),
+                      ]),
+                    ),
+                  ];
+                },
               ),
             ],
           ),
@@ -754,6 +760,7 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
@@ -784,7 +791,7 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Modifier le profil',
+              l.editProfile,
               style: Theme.of(context)
                   .textTheme
                   .titleLarge
@@ -795,7 +802,7 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
               controller: _nomCtrl,
               textCapitalization: TextCapitalization.words,
               decoration: InputDecoration(
-                labelText: 'Nom d\'utilisateur *',
+                labelText: '${l.usernameLabel} *',
                 prefixIcon: const Icon(Icons.person_outline),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12)),
@@ -806,7 +813,7 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
               controller: _villeCtrl,
               textCapitalization: TextCapitalization.words,
               decoration: InputDecoration(
-                labelText: 'Ville',
+                labelText: l.cityLabel,
                 prefixIcon:
                     const Icon(Icons.location_city_outlined),
                 border: OutlineInputBorder(
@@ -823,7 +830,7 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
                       child: CircularProgressIndicator(
                           strokeWidth: 2, color: Colors.white))
                   : const Icon(Icons.check),
-              label: Text(_saving ? 'Enregistrement...' : 'Enregistrer'),
+              label: Text(_saving ? l.saving : l.save),
               style: FilledButton.styleFrom(
                 padding:
                     const EdgeInsets.symmetric(vertical: 14),

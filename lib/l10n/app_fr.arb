@@ -1,0 +1,406 @@
+{
+  "@@locale": "fr",
+
+  "appName": "CamerMarket",
+  "@appName": { "description": "Application name" },
+
+  "appTagline": "LE MARCHÉ DIGITAL DU CAMEROUN",
+  "@appTagline": { "description": "App tagline displayed on splash / auth screens" },
+
+  "welcome": "Bienvenue !",
+  "@welcome": {},
+
+  "welcomeSubtitle": "Achetez, vendez et échangez avec des\ncommerçants vérifiés près de chez vous.",
+  "@welcomeSubtitle": {},
+
+  "securityNote": "Transactions sécurisées · Commerçants géolocalisés",
+  "@securityNote": {},
+
+  "createAccount": "Créer un compte",
+  "@createAccount": {},
+
+  "signIn": "Se connecter",
+  "@signIn": {},
+
+  "continueWithPhone": "Continuer avec un numéro",
+  "@continueWithPhone": {},
+
+  "continueWithGoogle": "Continuer avec Google",
+  "@continueWithGoogle": {},
+
+  "continueAsVisitor": "Continuer en tant que visiteur",
+  "@continueAsVisitor": {},
+
+  "buy": "Acheter",
+  "@buy": {},
+
+  "sell": "Vendre",
+  "@sell": {},
+
+  "deliver": "Livrer",
+  "@deliver": {},
+
+  "navMap": "Carte",
+  "@navMap": {},
+
+  "navHome": "Accueil",
+  "@navHome": {},
+
+  "navOrders": "Commandes",
+  "@navOrders": {},
+
+  "navFavorites": "Favoris",
+  "@navFavorites": {},
+
+  "navProfile": "Profil",
+  "@navProfile": {},
+
+  "searchHint": "Rechercher un marché, produit...",
+  "@searchHint": {},
+
+  "searchMapHint": "Rechercher sur la carte...",
+  "@searchMapHint": {},
+
+  "addCommerce": "Ajouter mon commerce",
+  "@addCommerce": {},
+
+  "visitBoutique": "Visiter la boutique",
+  "@visitBoutique": {},
+
+  "contactSeller": "Contacter le commerçant",
+  "@contactSeller": {},
+
+  "nearbySection": "À proximité · {count} commerce{plural}",
+  "@nearbySection": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "plural": { "type": "String" }
+    }
+  },
+
+  "filterAll": "Tous",
+  "@filterAll": {},
+
+  "filterButton": "Filtres",
+  "@filterButton": {},
+
+  "filterWithCount": "Filtres ({count})",
+  "@filterWithCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "gpsActive": "GPS actif",
+  "@gpsActive": {},
+
+  "offlineError": "Erreur réseau. Données en cache affichées.",
+  "@offlineError": {},
+
+  "retry": "Réessayer",
+  "@retry": {},
+
+  "anonBannerText": "Mode visiteur — Créez un compte pour commander",
+  "@anonBannerText": {},
+
+  "profileTitle": "Profil",
+  "@profileTitle": {},
+
+  "myShops": "Mes boutiques & établissements",
+  "@myShops": {},
+
+  "create": "Créer",
+  "@create": {},
+
+  "noShop": "Aucune boutique",
+  "@noShop": {},
+
+  "noShopSubtitle": "Créez votre première boutique ou établissement",
+  "@noShopSubtitle": {},
+
+  "settings": "Paramètres",
+  "@settings": {},
+
+  "messages": "Messages",
+  "@messages": {},
+
+  "myOrders": "Mes commandes",
+  "@myOrders": {},
+
+  "notifications": "Notifications",
+  "@notifications": {},
+
+  "securityPin": "Sécurité & PIN",
+  "@securityPin": {},
+
+  "privacyPolicy": "Politique de confidentialité",
+  "@privacyPolicy": {},
+
+  "helpSupport": "Aide & Support",
+  "@helpSupport": {},
+
+  "signOut": "Déconnexion",
+  "@signOut": {},
+
+  "signOutConfirm": "Confirmer la déconnexion",
+  "@signOutConfirm": {},
+
+  "signOutMessage": "Êtes-vous sûr de vouloir vous déconnecter ?",
+  "@signOutMessage": {},
+
+  "cartTitle": "Mon panier",
+  "@cartTitle": {},
+
+  "cartEmpty": "Votre panier est vide",
+  "@cartEmpty": {},
+
+  "cartEmptySubtitle": "Ajoutez des produits depuis les boutiques",
+  "@cartEmptySubtitle": {},
+
+  "cartClear": "Vider le panier",
+  "@cartClear": {},
+
+  "cartClearConfirm": "Vider le panier ?",
+  "@cartClearConfirm": {},
+
+  "cartTotal": "Total",
+  "@cartTotal": {},
+
+  "proceedToCheckout": "Passer la commande",
+  "@proceedToCheckout": {},
+
+  "orderTrackingTitle": "Suivi de commande",
+  "@orderTrackingTitle": {},
+
+  "orderStatusEnAttente": "En attente",
+  "@orderStatusEnAttente": {},
+
+  "orderStatusConfirmee": "Confirmée",
+  "@orderStatusConfirmee": {},
+
+  "orderStatusEnLivraison": "En livraison",
+  "@orderStatusEnLivraison": {},
+
+  "orderStatusLivree": "Livrée",
+  "@orderStatusLivree": {},
+
+  "orderStatusAnnulee": "Annulée",
+  "@orderStatusAnnulee": {},
+
+  "cancelOrder": "Annuler la commande",
+  "@cancelOrder": {},
+
+  "ordersListTitle": "Mes commandes",
+  "@ordersListTitle": {},
+
+  "ordersEmpty": "Aucune commande pour l'instant",
+  "@ordersEmpty": {},
+
+  "ordersEmptySubtitle": "Vos commandes apparaîtront ici",
+  "@ordersEmptySubtitle": {},
+
+  "favoritesTitle": "Mes favoris",
+  "@favoritesTitle": {},
+
+  "favoritesEmpty": "Aucun favori pour l'instant",
+  "@favoritesEmpty": {},
+
+  "searchTitle": "Recherche",
+  "@searchTitle": {},
+
+  "searchNoResult": "Aucun résultat",
+  "@searchNoResult": {},
+
+  "checkoutTitle": "Passer la commande",
+  "@checkoutTitle": {},
+
+  "checkoutAddress": "Adresse de livraison",
+  "@checkoutAddress": {},
+
+  "checkoutAddressHint": "Quartier, rue, point de repère...",
+  "@checkoutAddressHint": {},
+
+  "checkoutPhone": "Numéro de téléphone",
+  "@checkoutPhone": {},
+
+  "checkoutPhoneHint": "6XX XXX XXX",
+  "@checkoutPhoneHint": {},
+
+  "checkoutPayment": "Mode de paiement",
+  "@checkoutPayment": {},
+
+  "checkoutPayCash": "Paiement à la livraison",
+  "@checkoutPayCash": {},
+
+  "checkoutConfirm": "Confirmer la commande",
+  "@checkoutConfirm": {},
+
+  "cancel": "Annuler",
+  "@cancel": {},
+
+  "confirm": "Confirmer",
+  "@confirm": {},
+
+  "save": "Enregistrer",
+  "@save": {},
+
+  "delete": "Supprimer",
+  "@delete": {},
+
+  "edit": "Modifier",
+  "@edit": {},
+
+  "loading": "Chargement...",
+  "@loading": {},
+
+  "error": "Erreur",
+  "@error": {},
+
+  "errorNetwork": "Erreur réseau. Vérifiez votre connexion.",
+  "@errorNetwork": {},
+
+  "errorGeneric": "Une erreur est survenue. Veuillez réessayer.",
+  "@errorGeneric": {},
+
+  "yes": "Oui",
+  "@yes": {},
+
+  "no": "Non",
+  "@no": {},
+
+  "close": "Fermer",
+  "@close": {},
+
+  "back": "Retour",
+  "@back": {},
+
+  "share": "Partager",
+  "@share": {},
+
+  "report": "Signaler",
+  "@report": {},
+
+  "verified": "Vérifié",
+  "@verified": {},
+
+  "shopType_boutique": "Boutique",
+  "@shopType_boutique": {},
+
+  "shopType_etablissement": "Établissement",
+  "@shopType_etablissement": {},
+
+  "addedToCart": "{name} ajouté au panier",
+  "@addedToCart": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+
+  "viewCart": "Voir panier",
+  "@viewCart": {},
+
+  "requireAccountTitle": "Compte requis",
+  "@requireAccountTitle": {},
+
+  "requireAccountMessage": "Créez un compte pour accéder à cette fonctionnalité.",
+  "@requireAccountMessage": {},
+
+  "cguTitle": "Conditions d'utilisation",
+  "@cguTitle": {},
+
+  "privacyTitle": "Politique de confidentialité",
+  "@privacyTitle": {},
+
+  "forgotPasswordTitle": "Mot de passe oublié",
+  "@forgotPasswordTitle": {},
+
+  "helpTitle": "Aide & Support",
+  "@helpTitle": {},
+
+  "orDivider": "ou",
+  "@orDivider": {},
+
+  "continueWithoutAccount": "Continuer sans compte",
+  "@continueWithoutAccount": {},
+
+  "errorGoogleSignIn": "Connexion Google échouée. Réessayez.",
+  "@errorGoogleSignIn": {},
+
+  "registerTitle": "Votre profil",
+  "@registerTitle": {},
+
+  "registerSubtitle": "Ces informations seront visibles\npar les autres utilisateurs",
+  "@registerSubtitle": {},
+
+  "usernameLabel": "Nom d'utilisateur",
+  "@usernameLabel": {},
+
+  "usernameHint": "Ex: jeankamga",
+  "@usernameHint": {},
+
+  "cityLabel": "Ville",
+  "@cityLabel": {},
+
+  "birthDateLabel": "Date de naissance",
+  "@birthDateLabel": {},
+
+  "selectDate": "Sélectionner une date",
+  "@selectDate": {},
+
+  "termsPrefix": "En terminant votre inscription, vous acceptez nos ",
+  "@termsPrefix": {},
+
+  "termsAnd": " et notre ",
+  "@termsAnd": {},
+
+  "finishRegistration": "Terminer l'inscription",
+  "@finishRegistration": {},
+
+  "usernameRequired": "Veuillez entrer votre nom d'utilisateur",
+  "@usernameRequired": {},
+
+  "birthDateRequired": "Veuillez entrer votre date de naissance",
+  "@birthDateRequired": {},
+
+  "slowNetwork": "Réseau lent. Vérifiez votre connexion et réessayez.",
+  "@slowNetwork": {},
+
+  "cartClearShort": "Vider",
+  "@cartClearShort": {},
+
+  "cartClearConfirmMessage": "Supprimer tous les articles ?",
+  "@cartClearConfirmMessage": {},
+
+  "checkoutButtonCOD": "Commander — Paiement à la livraison",
+  "@checkoutButtonCOD": {},
+
+  "cartItemWord": "article",
+  "@cartItemWord": {},
+
+  "notProvided": "Non renseignée",
+  "@notProvided": {},
+
+  "memberSince": "Membre depuis",
+  "@memberSince": {},
+
+  "signOutButton": "Se déconnecter",
+  "@signOutButton": {},
+
+  "signOutDialogTitle": "Déconnexion",
+  "@signOutDialogTitle": {},
+
+  "commerceDeleted": "Commerce supprimé",
+  "@commerceDeleted": {},
+
+  "editProfile": "Modifier le profil",
+  "@editProfile": {},
+
+  "visitShop": "Voir la boutique",
+  "@visitShop": {},
+
+  "loadShopsError": "Impossible de charger les boutiques",
+  "@loadShopsError": {},
+
+  "saving": "Enregistrement...",
+  "@saving": {}
+}

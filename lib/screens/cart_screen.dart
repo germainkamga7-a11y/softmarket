@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:go_router/go_router.dart';
 
+import '../l10n/app_localizations.dart';
 import '../router/app_router.dart';
 import '../services/analytics_service.dart';
 import '../services/cart_service.dart';
@@ -14,18 +15,19 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final cart = context.watch<CartService>();
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mon panier'),
+        title: Text(l.cartTitle),
         actions: [
           if (cart.items.isNotEmpty)
             TextButton(
               onPressed: () => _confirmClear(context, cart),
-              child: const Text('Vider', style: TextStyle(color: Colors.white)),
+              child: Text(l.cartClearShort, style: const TextStyle(color: Colors.white)),
             ),
         ],
       ),
@@ -38,11 +40,10 @@ class CartScreen extends StatelessWidget {
                       size: 72,
                       color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4)),
                   const SizedBox(height: 16),
-                  Text('Votre panier est vide',
-                      style: textTheme.titleMedium),
+                  Text(l.cartEmpty, style: textTheme.titleMedium),
                   const SizedBox(height: 8),
                   Text(
-                    'Ajoutez des produits depuis les boutiques.',
+                    l.cartEmptySubtitle,
                     style: textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant),
                     textAlign: TextAlign.center,
@@ -68,22 +69,23 @@ class CartScreen extends StatelessWidget {
   }
 
   void _confirmClear(BuildContext context, CartService cart) {
+    final l = AppLocalizations.of(context)!;
     showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Vider le panier'),
-        content: const Text('Supprimer tous les articles ?'),
+        title: Text(l.cartClear),
+        content: Text(l.cartClearConfirmMessage),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Annuler')),
+              child: Text(l.cancel)),
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
               cart.clear();
             },
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Vider'),
+            child: Text(l.cartClearShort),
           ),
         ],
       ),
@@ -246,6 +248,7 @@ class _CartSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -263,8 +266,10 @@ class _CartSummary extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Total (${cart.itemCount} article${cart.itemCount > 1 ? 's' : ''})',
-                  style: const TextStyle(fontWeight: FontWeight.w600)),
+              Text(
+                '${l.cartTotal} (${cart.itemCount} ${l.cartItemWord}${cart.itemCount > 1 ? 's' : ''})',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
               Text(
                 '${cart.totalAmount.round()} FCFA',
                 style: TextStyle(
@@ -290,7 +295,7 @@ class _CartSummary extends StatelessWidget {
                 );
               },
               icon: const Icon(Icons.local_shipping_outlined, size: 18),
-              label: const Text('Commander — Paiement à la livraison'),
+              label: Text(l.checkoutButtonCOD),
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

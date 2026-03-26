@@ -1,0 +1,196 @@
+{
+  "@@locale": "en",
+
+  "appName": "CamerMarket",
+  "appTagline": "CAMEROON'S DIGITAL MARKET",
+  "welcome": "Welcome!",
+  "welcomeSubtitle": "Buy, sell and trade with verified\nmerchants near you.",
+  "securityNote": "Secure transactions · Geolocated merchants",
+  "createAccount": "Create account",
+  "signIn": "Sign in",
+  "continueWithPhone": "Continue with phone number",
+  "continueWithGoogle": "Continue with Google",
+  "continueAsVisitor": "Continue as visitor",
+  "buy": "Buy",
+  "sell": "Sell",
+  "deliver": "Deliver",
+
+  "navMap": "Map",
+  "navHome": "Home",
+  "navOrders": "Orders",
+  "navFavorites": "Favourites",
+  "navProfile": "Profile",
+
+  "searchHint": "Search a market, product...",
+  "searchMapHint": "Search on map...",
+  "addCommerce": "Add my business",
+  "visitBoutique": "Visit the shop",
+  "contactSeller": "Contact seller",
+
+  "nearbySection": "Nearby · {count} business{plural}",
+  "@nearbySection": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "plural": { "type": "String" }
+    }
+  },
+
+  "filterAll": "All",
+  "filterButton": "Filters",
+  "filterWithCount": "Filters ({count})",
+  "@filterWithCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "gpsActive": "GPS active",
+  "offlineError": "Network error. Cached data displayed.",
+  "retry": "Retry",
+  "anonBannerText": "Visitor mode — Create an account to order",
+
+  "profileTitle": "Profile",
+  "myShops": "My shops & businesses",
+  "create": "Create",
+  "noShop": "No shop yet",
+  "noShopSubtitle": "Create your first shop or business",
+  "settings": "Settings",
+  "messages": "Messages",
+  "myOrders": "My orders",
+  "notifications": "Notifications",
+  "securityPin": "Security & PIN",
+  "privacyPolicy": "Privacy policy",
+  "helpSupport": "Help & Support",
+  "signOut": "Sign out",
+  "signOutConfirm": "Confirm sign out",
+  "signOutMessage": "Are you sure you want to sign out?",
+
+  "cartTitle": "My cart",
+  "cartEmpty": "Your cart is empty",
+  "cartEmptySubtitle": "Add products from shops",
+  "cartClear": "Clear cart",
+  "cartClearConfirm": "Clear cart?",
+  "cartTotal": "Total",
+  "proceedToCheckout": "Place order",
+
+  "orderTrackingTitle": "Order tracking",
+  "orderStatusEnAttente": "Pending",
+  "orderStatusConfirmee": "Confirmed",
+  "orderStatusEnLivraison": "Out for delivery",
+  "orderStatusLivree": "Delivered",
+  "orderStatusAnnulee": "Cancelled",
+  "cancelOrder": "Cancel order",
+
+  "ordersListTitle": "My orders",
+  "ordersEmpty": "No orders yet",
+  "ordersEmptySubtitle": "Your orders will appear here",
+
+  "favoritesTitle": "My favourites",
+  "favoritesEmpty": "No favourites yet",
+
+  "searchTitle": "Search",
+  "searchNoResult": "No results",
+
+  "checkoutTitle": "Place order",
+  "checkoutAddress": "Delivery address",
+  "checkoutAddressHint": "Neighbourhood, street, landmark...",
+  "checkoutPhone": "Phone number",
+  "checkoutPhoneHint": "6XX XXX XXX",
+  "checkoutPayment": "Payment method",
+  "checkoutPayCash": "Cash on delivery",
+  "checkoutConfirm": "Confirm order",
+
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "save": "Save",
+  "delete": "Delete",
+  "edit": "Edit",
+  "loading": "Loading...",
+  "error": "Error",
+  "errorNetwork": "Network error. Check your connection.",
+  "errorGeneric": "An error occurred. Please try again.",
+  "yes": "Yes",
+  "no": "No",
+  "close": "Close",
+  "back": "Back",
+  "share": "Share",
+  "report": "Report",
+  "verified": "Verified",
+
+  "shopType_boutique": "Shop",
+  "shopType_etablissement": "Business",
+
+  "addedToCart": "{name} added to cart",
+  "@addedToCart": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+
+  "viewCart": "View cart",
+  "requireAccountTitle": "Account required",
+  "requireAccountMessage": "Create an account to access this feature.",
+
+  "cguTitle": "Terms of use",
+  "privacyTitle": "Privacy policy",
+  "forgotPasswordTitle": "Forgot password",
+  "helpTitle": "Help & Support",
+
+  "orDivider": "or",
+
+  "continueWithoutAccount": "Continue without account",
+
+  "errorGoogleSignIn": "Google sign-in failed. Please try again.",
+
+  "registerTitle": "Your profile",
+
+  "registerSubtitle": "This information will be visible\nto other users",
+
+  "usernameLabel": "Username",
+
+  "usernameHint": "e.g. jeankamga",
+
+  "cityLabel": "City",
+
+  "birthDateLabel": "Date of birth",
+
+  "selectDate": "Select a date",
+
+  "termsPrefix": "By completing your registration, you agree to our ",
+
+  "termsAnd": " and our ",
+
+  "finishRegistration": "Finish registration",
+
+  "usernameRequired": "Please enter your username",
+
+  "birthDateRequired": "Please enter your date of birth",
+
+  "slowNetwork": "Slow network. Check your connection and try again.",
+
+  "cartClearShort": "Clear",
+
+  "cartClearConfirmMessage": "Remove all items?",
+
+  "checkoutButtonCOD": "Order — Cash on delivery",
+
+  "cartItemWord": "item",
+
+  "notProvided": "Not provided",
+
+  "memberSince": "Member since",
+
+  "signOutButton": "Sign out",
+
+  "signOutDialogTitle": "Sign out",
+
+  "commerceDeleted": "Business deleted",
+
+  "editProfile": "Edit profile",
+
+  "visitShop": "View shop",
+
+  "loadShopsError": "Unable to load shops",
+
+  "saving": "Saving..."
+}

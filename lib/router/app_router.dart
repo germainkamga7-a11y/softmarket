@@ -18,6 +18,7 @@ import '../screens/notifications_screen.dart';
 import '../screens/order_checkout_screen.dart';
 import '../screens/order_tracking_screen.dart';
 import '../screens/orders_list_screen.dart';
+import '../screens/phone_auth_screen.dart';
 import '../screens/privacy_policy_screen.dart';
 import '../screens/register_screen.dart';
 import '../screens/search_screen.dart';
@@ -31,6 +32,7 @@ import '../services/commerce_service.dart';
 class Routes {
   static const welcome        = '/welcome';
   static const login          = '/login';
+  static const phoneAuth      = '/phone-auth';
   static const register       = '/register';
   static const home           = '/home';
   static const boutique       = '/boutique';
@@ -98,6 +100,7 @@ class AppRouter {
     // Routes publiques (accessibles sans être connecté)
     final isPublic = location == Routes.welcome ||
         location == Routes.login ||
+        location == Routes.phoneAuth ||
         location == Routes.register ||
         location == Routes.cgu ||
         location == Routes.privacy;
@@ -122,6 +125,10 @@ class AppRouter {
         GoRoute(
           path: Routes.login,
           builder: (_, __) => const LoginScreen(),
+        ),
+        GoRoute(
+          path: Routes.phoneAuth,
+          builder: (_, __) => const PhoneAuthScreen(),
         ),
         GoRoute(
           path: Routes.register,

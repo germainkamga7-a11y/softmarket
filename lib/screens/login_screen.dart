@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:go_router/go_router.dart';
+
+import '../l10n/app_localizations.dart';
+import '../router/app_router.dart';
 import '../services/social_auth_service.dart';
-import 'phone_auth_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -22,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final result = await SocialAuthService.signInWithGoogle();
       if (!mounted) return;
       if (result == SocialAuthResult.error) {
-        _showError('Connexion Google échouée. Réessayez.');
+        _showError(AppLocalizations.of(context)!.errorGoogleSignIn);
       }
       // Si success → AuthGate détecte le changement et navigue automatiquement
     } catch (e) {
@@ -57,6 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l           = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme   = Theme.of(context).textTheme;
     final size        = MediaQuery.of(context).size;
@@ -97,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'LE MARCHÉ DIGITAL DU CAMEROUN',
+                        l.appTagline,
                         textAlign: TextAlign.center,
                         style: textTheme.bodySmall?.copyWith(
                           color: const Color(0xFFFFB300),
@@ -130,13 +134,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Bienvenue !',
+                        l.welcome,
                         style: textTheme.headlineSmall
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Achetez, vendez et échangez avec des\ncommerçants vérifiés près de chez vous.',
+                        l.welcomeSubtitle,
                         style: textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant),
                       ),
@@ -146,14 +150,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(
                         height: 52,
                         child: FilledButton.icon(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const PhoneAuthScreen(),
-                            ),
-                          ),
+                          onPressed: () => context.push(Routes.phoneAuth),
                           icon: const Icon(Icons.phone_outlined),
-                          label: const Text('Continuer avec un numéro'),
+                          label: Text(l.continueWithPhone),
                           style: FilledButton.styleFrom(
                             backgroundColor: const Color(0xFFCC0000),
                             foregroundColor: Colors.white,
@@ -188,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     _GoogleLogo(),
                                     const SizedBox(width: 10),
                                     Text(
-                                      'Continuer avec Google',
+                                      l.continueWithGoogle,
                                       style: textTheme.bodyMedium?.copyWith(
                                           fontWeight: FontWeight.w600),
                                     ),
@@ -205,7 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Expanded(child: Divider(color: colorScheme.outlineVariant)),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Text('ou',
+                            child: Text(l.orDivider,
                                 style: textTheme.bodySmall?.copyWith(
                                     color: colorScheme.onSurfaceVariant)),
                           ),
@@ -228,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   size: 18,
                                   color: colorScheme.onSurfaceVariant),
                           label: Text(
-                            'Continuer sans compte',
+                            l.continueWithoutAccount,
                             style: textTheme.bodyMedium?.copyWith(
                                 color: colorScheme.onSurfaceVariant),
                           ),
@@ -242,7 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 8),
                       Center(
                         child: Text(
-                          'Transactions sécurisées · Commerçants géolocalisés',
+                          l.securityNote,
                           textAlign: TextAlign.center,
                           style: textTheme.bodySmall?.copyWith(
                               color: colorScheme.onSurfaceVariant),
