@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
-import 'register_screen.dart';
+import 'package:go_router/go_router.dart';
+
+import '../router/app_router.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -104,10 +105,7 @@ class WelcomeScreen extends StatelessWidget {
 
                         // Bouton S'inscrire
                         FilledButton.icon(
-                          onPressed: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (_) => const RegisterScreen()),
-                          ),
+                          onPressed: () => context.push(Routes.register),
                           icon: const Icon(Icons.person_add_outlined),
                           label: const Text('Créer un compte'),
                           style: FilledButton.styleFrom(
@@ -122,10 +120,7 @@ class WelcomeScreen extends StatelessWidget {
 
                         // Bouton Se connecter
                         OutlinedButton.icon(
-                          onPressed: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (_) => const LoginScreen()),
-                          ),
+                          onPressed: () => context.push(Routes.login),
                           icon: const Icon(Icons.login),
                           label: const Text('Se connecter'),
                           style: OutlinedButton.styleFrom(

@@ -2,10 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:go_router/go_router.dart';
+
+import '../router/app_router.dart';
 import '../services/analytics_service.dart';
 import '../services/cart_service.dart';
 import '../theme/app_colors.dart';
-import 'order_checkout_screen.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -279,13 +281,11 @@ class _CartSummary extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: () {
                 AnalyticsService.logBeginCheckout(total: cart.totalAmount);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => OrderCheckoutScreen(
-                      items: List.of(cart.items),
-                      total: cart.totalAmount,
-                    ),
+                context.push(
+                  Routes.checkout,
+                  extra: CheckoutArgs(
+                    items: List.of(cart.items),
+                    total: cart.totalAmount,
                   ),
                 );
               },

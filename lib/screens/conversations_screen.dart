@@ -3,8 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'package:go_router/go_router.dart';
+
+import '../router/app_router.dart';
 import '../services/chat_service.dart';
-import 'chat_screen.dart';
 
 // ConversationsScreen doit être StatefulWidget pour cacher le stream dans
 // initState. Un StatelessWidget appelant ChatService().streamConversations()
@@ -163,15 +165,10 @@ class _ConversationTile extends StatelessWidget {
     return ListTile(
       contentPadding:
           const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ChatScreen(
-            otherUserId: otherUid,
-            otherUserName: otherName,
-          ),
-        ),
-      ),
+      onTap: () => context.push(Routes.chat, extra: ChatArgs(
+        otherUserId: otherUid,
+        otherUserName: otherName,
+      )),
       leading: CircleAvatar(
         radius: 26,
         backgroundColor: colorScheme.primaryContainer,

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../router/app_router.dart';
 import '../services/analytics_service.dart';
 import '../services/cart_service.dart';
 import '../services/order_service.dart';
 import '../theme/app_colors.dart';
-import 'order_tracking_screen.dart';
 
 class OrderCheckoutScreen extends StatefulWidget {
   final List<CartItem> items;
@@ -79,12 +80,8 @@ class _OrderCheckoutScreenState extends State<OrderCheckoutScreen> {
       // Vider le panier
       context.read<CartService>().clear();
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => OrderTrackingScreen(orderId: orderId, isNewOrder: true),
-        ),
-      );
+      // pushReplacement → context.go pour remplacer le stack
+      context.go(Routes.orderPath(orderId));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

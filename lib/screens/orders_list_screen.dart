@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../router/app_router.dart';
 import '../services/order_service.dart';
 import '../theme/app_colors.dart';
-import 'order_tracking_screen.dart';
 
 class OrdersListScreen extends StatelessWidget {
   const OrdersListScreen({super.key});
@@ -109,12 +110,7 @@ class _OrderCard extends StatelessWidget {
       elevation: 0,
       color: colorScheme.surfaceContainerLow,
       child: InkWell(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => OrderTrackingScreen(orderId: order.id),
-          ),
-        ),
+        onTap: () => context.push(Routes.orderPath(order.id)),
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),

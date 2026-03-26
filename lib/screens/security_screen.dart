@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'cgu_screen.dart';
-import 'forgot_password_screen.dart';
-import 'privacy_policy_screen.dart';
+import 'package:go_router/go_router.dart';
+
+import '../router/app_router.dart';
 
 class SecurityScreen extends StatefulWidget {
   const SecurityScreen({super.key});
@@ -204,10 +204,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
               ),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
-              ),
+              onTap: () => context.push(Routes.forgotPassword),
             ),
           ),
 
@@ -234,11 +231,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                   title: const Text('Politique de confidentialité',
                       style: TextStyle(fontWeight: FontWeight.w500)),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const PrivacyPolicyScreen()),
-                  ),
+                  onTap: () => context.push(Routes.privacy),
                 ),
                 const Divider(height: 1, indent: 56),
                 ListTile(
@@ -254,10 +247,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                   title: const Text("Conditions d'utilisation (CGU)",
                       style: TextStyle(fontWeight: FontWeight.w500)),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const CguScreen()),
-                  ),
+                  onTap: () => context.push(Routes.cgu),
                 ),
               ],
             ),

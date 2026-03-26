@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import 'package:go_router/go_router.dart';
+
+import '../router/app_router.dart';
 import '../services/commerce_service.dart';
 import '../services/favorite_service.dart';
-import 'boutique_screen.dart';
 
 // FavoritesScreen doit être StatefulWidget pour cacher le stream dans initState.
 // Si laissé StatelessWidget, FavoriteService.streamFavorites() est appelé à
@@ -116,11 +118,7 @@ class _FavoriteCard extends StatelessWidget {
       ),
       clipBehavior: Clip.hardEdge,
       child: InkWell(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => BoutiqueScreen(commerce: commerce)),
-        ),
+        onTap: () => context.push(Routes.boutique, extra: commerce),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Row(

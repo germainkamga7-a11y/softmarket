@@ -5,9 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import 'package:go_router/go_router.dart';
+
 import '../main.dart' show navigatorKey, scaffoldMessengerKey;
-import '../screens/chat_screen.dart';
-import '../screens/order_tracking_screen.dart';
+import '../router/app_router.dart';
 
 bool get _isDesktopNative =>
     !kIsWeb &&
@@ -161,14 +162,10 @@ class NotificationService {
     final senderName = parts.length > 2 ? parts[2] : 'Utilisateur';
 
     if (type == 'message' && senderId != null && senderId.isNotEmpty) {
-      navigatorKey.currentState?.push(
-        MaterialPageRoute(
-          builder: (_) => ChatScreen(
-            otherUserId: senderId,
-            otherUserName: senderName,
-          ),
-        ),
-      );
+      navigatorKey.currentContext?.push(Routes.chat, extra: ChatArgs(
+        otherUserId: senderId,
+        otherUserName: senderName,
+      ));
     }
   }
 
@@ -210,22 +207,14 @@ class NotificationService {
       final senderId = data['sender_id'] as String?;
       final senderName = data['sender_name'] as String? ?? 'Utilisateur';
       if (senderId == null) return;
-      navigatorKey.currentState?.push(
-        MaterialPageRoute(
-          builder: (_) => ChatScreen(
-            otherUserId: senderId,
-            otherUserName: senderName,
-          ),
-        ),
-      );
+      navigatorKey.currentContext?.push(Routes.chat, extra: ChatArgs(
+        otherUserId: senderId,
+        otherUserName: senderName,
+      ));
     } else if (type == 'order' || type == 'order_status') {
       final orderId = data['order_id'] as String?;
       if (orderId == null) return;
-      navigatorKey.currentState?.push(
-        MaterialPageRoute(
-          builder: (_) => OrderTrackingScreen(orderId: orderId),
-        ),
-      );
+      navigatorKey.currentContext?.push(Routes.orderPath(orderId));
     }
   }
 

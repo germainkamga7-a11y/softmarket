@@ -5,26 +5,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../router/app_router.dart';
 import '../services/cart_service.dart';
 import '../services/map_service.dart';
 import '../services/commerce_service.dart';
 import '../services/favorite_service.dart';
 import '../services/social_auth_service.dart';
 import '../theme/app_colors.dart';
-import 'add_boutique_screen.dart';
-import 'boutique_screen.dart';
-import 'cart_screen.dart';
-import 'chat_screen.dart';
 import 'favorites_screen.dart';
 import 'orders_list_screen.dart';
-import 'profile_screen.dart';
 import 'product_detail_screen.dart';
-import 'search_screen.dart';
+import 'profile_screen.dart';
 
 class CamerMarketScreen extends StatefulWidget {
   const CamerMarketScreen({super.key});
@@ -75,6 +72,23 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
     _initializeMap();
     _startLocationStream();
     _loadInitialProducts();
+    _checkProfile();
+  }
+
+  // Redirige vers /register si le profil Firestore n'existe pas encore
+  // (cas : auto-vérification Android avant fin d'inscription).
+  Future<void> _checkProfile() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get();
+    if (!doc.exists && mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) context.go(Routes.register);
+      });
+    }
   }
 
   Future<void> _loadInitialProducts() async {
@@ -350,9 +364,7 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
 
   Future<void> _startAddCommerce() async {
     if (!SocialAuthService.requireAccount(context)) return;
-    await Navigator.of(context).push<bool>(
-      MaterialPageRoute(builder: (_) => const AddBoutiqueScreen()),
-    );
+    await context.push(Routes.addBoutique);
     // Le stream Firestore met à jour les marqueurs automatiquement
   }
 
@@ -484,9 +496,7 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                 child: FilledButton.icon(
                   onPressed: () {
                     Navigator.pop(ctx);
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => BoutiqueScreen(commerce: commerce),
-                    ));
+                    context.push(Routes.boutique, extra: commerce);
                   },
                   icon: const Icon(Icons.storefront_outlined),
                   label: const Text('Visiter la boutique'),
@@ -500,11 +510,9 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                 child: OutlinedButton.icon(
                   onPressed: () {
                     Navigator.pop(ctx);
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => ChatScreen(
-                        otherUserId: commerce.userId,
-                        otherUserName: commerce.nomBoutique,
-                      ),
+                    context.push(Routes.chat, extra: ChatArgs(
+                      otherUserId: commerce.userId,
+                      otherUserName: commerce.nomBoutique,
                     ));
                   },
                   icon: const Icon(Icons.chat_outlined),
@@ -574,11 +582,7 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                     IconButton(
                       icon: const Icon(Icons.shopping_cart_outlined),
                       color: colorScheme.onPrimary,
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const CartScreen()),
-                      ),
+                      onPressed: () => context.push(Routes.cart),
                     ),
                     if (cart.itemCount > 0)
                       Positioned(
@@ -618,9 +622,7 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
               child: SearchBar(
                 hintText: 'Rechercher un marché, produit...',
                 leading: const Icon(Icons.search, size: 20),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const SearchScreen()),
-                ),
+                onTap: () => context.push(Routes.search),
                 elevation: const WidgetStatePropertyAll(0),
                 backgroundColor: WidgetStatePropertyAll(
                     colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)),
@@ -902,9 +904,7 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
               child: SearchBar(
                 hintText: 'Rechercher sur la carte...',
                 leading: const Icon(Icons.search),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const SearchScreen()),
-                ),
+                onTap: () => context.push(Routes.search),
                 elevation: const WidgetStatePropertyAll(4),
                 padding: const WidgetStatePropertyAll(
                     EdgeInsets.symmetric(horizontal: 16)),
@@ -1419,9 +1419,7 @@ class _MarketCard extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () => Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => BoutiqueScreen(commerce: commerce),
-        )),
+        onTap: () => context.push(Routes.boutique, extra: commerce),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(

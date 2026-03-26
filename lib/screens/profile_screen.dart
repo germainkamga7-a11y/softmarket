@@ -9,19 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../router/app_router.dart';
 import '../services/commerce_service.dart';
-import 'add_boutique_screen.dart';
-import 'boutique_screen.dart';
-import 'conversations_screen.dart';
-import 'help_screen.dart';
-import 'orders_list_screen.dart';
-import 'notifications_screen.dart';
-import 'privacy_policy_screen.dart';
-import 'security_screen.dart';
-import 'welcome_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -154,12 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
     if (confirm != true || !mounted) return;
     await context.read<AppAuthProvider>().signOut();
-    if (mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-        (route) => false,
-      );
-    }
+    // go_router redirige automatiquement vers /login via refreshListenable
   }
 
   @override
@@ -339,8 +327,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         TextButton.icon(
-                          onPressed: () => Navigator.push(context,
-                              MaterialPageRoute(builder: (_) => const AddBoutiqueScreen())),
+                          onPressed: () => context.push(Routes.addBoutique),
                           icon: const Icon(Icons.add, size: 18),
                           label: const Text('Créer'),
                         ),
@@ -421,12 +408,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                                   child: _BoutiqueListTile(
                                     commerce: c,
-                                    onVisit: () => Navigator.push(context,
-                                        MaterialPageRoute(
-                                            builder: (_) => BoutiqueScreen(commerce: c))),
-                                    onEdit: () => Navigator.push(context,
-                                        MaterialPageRoute(
-                                            builder: (_) => AddBoutiqueScreen(boutique: c))),
+                                    onVisit: () => context.push(Routes.boutique, extra: c),
+                                    onEdit: () => context.push(Routes.addBoutique, extra: c),
                                     onDelete: () => _deleteCommerce(c),
                                   ),
                                 ))
@@ -455,8 +438,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             leading: Icon(Icons.chat_outlined, color: colorScheme.primary),
                             title: const Text('Messages'),
                             trailing: const Icon(Icons.chevron_right),
-                            onTap: () => Navigator.push(context,
-                                MaterialPageRoute(builder: (_) => const ConversationsScreen())),
+                            onTap: () => context.push(Routes.conversations),
                             shape: const RoundedRectangleBorder(
                                 borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
                           ),
@@ -465,40 +447,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             leading: Icon(Icons.receipt_long_outlined, color: colorScheme.primary),
                             title: const Text('Mes commandes'),
                             trailing: const Icon(Icons.chevron_right),
-                            onTap: () => Navigator.push(context,
-                                MaterialPageRoute(builder: (_) => const OrdersListScreen())),
+                            onTap: () => context.push(Routes.orders),
                           ),
                           Divider(height: 1, indent: 56, color: colorScheme.outlineVariant),
                           ListTile(
                             leading: Icon(Icons.notifications_outlined, color: colorScheme.primary),
                             title: const Text('Notifications'),
                             trailing: const Icon(Icons.chevron_right),
-                            onTap: () => Navigator.push(context,
-                                MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+                            onTap: () => context.push(Routes.notifications),
                           ),
                           Divider(height: 1, indent: 56, color: colorScheme.outlineVariant),
                           ListTile(
                             leading: Icon(Icons.security_outlined, color: colorScheme.primary),
                             title: const Text('Sécurité & PIN'),
                             trailing: const Icon(Icons.chevron_right),
-                            onTap: () => Navigator.push(context,
-                                MaterialPageRoute(builder: (_) => const SecurityScreen())),
+                            onTap: () => context.push(Routes.security),
                           ),
                           Divider(height: 1, indent: 56, color: colorScheme.outlineVariant),
                           ListTile(
                             leading: Icon(Icons.privacy_tip_outlined, color: colorScheme.primary),
                             title: const Text('Politique de confidentialité'),
                             trailing: const Icon(Icons.chevron_right),
-                            onTap: () => Navigator.push(context,
-                                MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen())),
+                            onTap: () => context.push(Routes.privacy),
                           ),
                           Divider(height: 1, indent: 56, color: colorScheme.outlineVariant),
                           ListTile(
                             leading: Icon(Icons.help_outline, color: colorScheme.primary),
                             title: const Text('Aide & Support'),
                             trailing: const Icon(Icons.chevron_right),
-                            onTap: () => Navigator.push(context,
-                                MaterialPageRoute(builder: (_) => const HelpScreen())),
+                            onTap: () => context.push(Routes.help),
                             shape: const RoundedRectangleBorder(
                                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(16))),
                           ),

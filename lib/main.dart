@@ -8,12 +8,9 @@ import 'package:provider/provider.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'screens/camer_market_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/register_screen.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
-import 'services/analytics_service.dart';
+import 'router/app_router.dart';
 import 'services/cart_service.dart';
 import 'services/notification_service.dart';
 
@@ -69,11 +66,27 @@ class SoftMarketApp extends StatefulWidget {
 }
 
 class _SoftMarketAppState extends State<SoftMarketApp> {
+  late final AppAuthProvider _auth;
+  late final AppRouter _appRouter;
+
+  @override
+  void initState() {
+    super.initState();
+    _auth = AppAuthProvider();
+    _appRouter = AppRouter(_auth);
+  }
+
+  @override
+  void dispose() {
+    _auth.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AppAuthProvider()),
+        ChangeNotifierProvider.value(value: _auth),
         ChangeNotifierProvider(create: (_) => CartService()),
       ],
       child: _buildApp(),
@@ -81,7 +94,7 @@ class _SoftMarketAppState extends State<SoftMarketApp> {
   }
 
   Widget _buildApp() {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'CamerMarket',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -151,9 +164,7 @@ class _SoftMarketAppState extends State<SoftMarketApp> {
       ),
       themeMode: ThemeMode.system,
       scaffoldMessengerKey: scaffoldMessengerKey,
-      navigatorKey: navigatorKey,
-      navigatorObservers: [AnalyticsService.observer],
-      home: const _AuthGate(),
+      routerConfig: _appRouter.router,
       // Sur desktop web : centrer le contenu dans un cadre mobile (430px max)
       builder: kIsWeb
           ? (context, child) {
@@ -175,75 +186,10 @@ class _SoftMarketAppState extends State<SoftMarketApp> {
   }
 }
 
+// ─── Écran de chargement (utilisé par CamerMarketScreen pendant la vérif profil)
 
-// ─── Routage authentification ────────────────────────────────────────────────
-
-class _AuthGate extends StatefulWidget {
-  const _AuthGate();
-
-  @override
-  State<_AuthGate> createState() => _AuthGateState();
-}
-
-class _AuthGateState extends State<_AuthGate> {
-  // Fallback : force la sortie du splash après N secondes si Firebase est lent
-  bool _timedOut = false;
-
-  @override
-  void initState() {
-    super.initState();
-    const timeoutDuration =
-        kIsWeb ? Duration(seconds: 6) : Duration(seconds: 12);
-    Future.delayed(timeoutDuration, () {
-      if (mounted) setState(() => _timedOut = true);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final auth = context.watch<AppAuthProvider>();
-
-    // Splash tant qu'on n'a pas de réponse ET que le timeout n'a pas expiré
-    if (!auth.isLoggedIn && !_timedOut && FirebaseAuth.instance.currentUser == null) {
-      return const _SplashScreen();
-    }
-
-    if (auth.isLoggedIn) return _ProfileCheck(uid: auth.uid!);
-    return const LoginScreen();
-  }
-}
-
-// ─── Vérification profil Firestore ───────────────────────────────────────────
-// Évite que _AuthGate navigue vers CamerMarketScreen si le profil n'existe pas
-// encore (ex: auto-vérification Android avant fin de l'inscription).
-
-class _ProfileCheck extends StatelessWidget {
-  final String uid;
-  const _ProfileCheck({required this.uid});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .snapshots(),
-      builder: (context, snap) {
-        if (!snap.hasData) return const _SplashScreen();
-        if (snap.data!.exists) return const CamerMarketScreen();
-        // Profil absent → l'utilisateur est authentifié mais n'a pas
-        // terminé son inscription (ex: auto-vérif Android). On reprend
-        // l'inscription à l'étape mot de passe.
-        return const RegisterScreen();
-      },
-    );
-  }
-}
-
-// ─── Écran de chargement ──────────────────────────────────────────────────────
-
-class _SplashScreen extends StatelessWidget {
-  const _SplashScreen();
+class SplashScreen extends StatelessWidget {
+  const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import 'package:go_router/go_router.dart';
+
+import '../router/app_router.dart';
 import '../services/commerce_service.dart';
-import 'boutique_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -179,9 +181,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _openBoutique(Commerce commerce) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => BoutiqueScreen(commerce: commerce)),
-    );
+    context.push(Routes.boutique, extra: commerce);
   }
 }
 

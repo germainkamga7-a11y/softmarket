@@ -3,16 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart' show Share;
 
+import 'package:go_router/go_router.dart';
+
+import '../router/app_router.dart';
 import '../services/cart_service.dart';
 import '../services/commerce_service.dart';
 import '../services/report_service.dart';
 import '../services/analytics_service.dart';
 import '../services/social_auth_service.dart';
 import '../theme/app_colors.dart';
-import 'boutique_screen.dart';
-import 'cart_screen.dart';
-import 'chat_screen.dart';
-import 'order_checkout_screen.dart';
 
 // ─── Fonction globale : ouvrir le détail produit en popup ─────────────────────
 
@@ -311,10 +310,7 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
                         InkWell(
                           onTap: () {
                             Navigator.pop(context);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => BoutiqueScreen(commerce: widget.commerce)),
-                            );
+                            context.push(Routes.boutique, extra: widget.commerce);
                           },
                           borderRadius: BorderRadius.circular(12),
                           child: Container(
@@ -398,11 +394,7 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
                       behavior: SnackBarBehavior.floating,
                       action: SnackBarAction(
                         label: 'Voir panier',
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const CartScreen()),
-                        ),
+                        onPressed: () => context.push(Routes.cart),
                       ),
                     ),
                   );
@@ -431,10 +423,7 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
                       child: OutlinedButton.icon(
                         onPressed: () {
                           Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => BoutiqueScreen(commerce: widget.commerce)),
-                          );
+                          context.push(Routes.boutique, extra: widget.commerce);
                         },
                         icon: Icon(isService ? Icons.business_center_outlined : Icons.storefront_outlined, size: 18),
                         label: const Text('La boutique'),
@@ -453,24 +442,19 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
                         onPressed: () {
                           if (!SocialAuthService.requireAccount(context)) return;
                           Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ChatScreen(
-                                otherUserId: widget.commerce.userId,
-                                otherUserName: widget.commerce.nomBoutique,
-                                productRef: {
-                                  'id': widget.docId,
-                                  'nom': widget.nom,
-                                  'prix': widget.prix,
-                                  'imageUrl': widget.imageUrls.isNotEmpty
-                                      ? widget.imageUrls.first
-                                      : null,
-                                  'categorie': widget.categorie,
-                                },
-                              ),
-                            ),
-                          );
+                          context.push(Routes.chat, extra: ChatArgs(
+                            otherUserId: widget.commerce.userId,
+                            otherUserName: widget.commerce.nomBoutique,
+                            productRef: {
+                              'id': widget.docId,
+                              'nom': widget.nom,
+                              'prix': widget.prix,
+                              'imageUrl': widget.imageUrls.isNotEmpty
+                                  ? widget.imageUrls.first
+                                  : null,
+                              'categorie': widget.categorie,
+                            },
+                          ));
                         },
                         icon: const Icon(Icons.chat_bubble_outline, size: 18),
                         label: const Text('Contacter'),
@@ -513,27 +497,22 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
                         onPressed: () {
                           if (!SocialAuthService.requireAccount(context)) return;
                           AnalyticsService.logBeginCheckout(total: widget.prix);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => OrderCheckoutScreen(
-                                items: [
-                                  CartItem(
-                                    productId:   widget.docId,
-                                    nom:         widget.nom,
-                                    prix:        widget.prix,
-                                    quantite:    1,
-                                    imageUrl:    widget.imageUrls.isNotEmpty
-                                        ? widget.imageUrls.first
-                                        : null,
-                                    commerceId:  widget.commerce.id ?? '',
-                                    commerceNom: widget.commerce.nomBoutique,
-                                  ),
-                                ],
-                                total: widget.prix,
+                          context.push(Routes.checkout, extra: CheckoutArgs(
+                            items: [
+                              CartItem(
+                                productId:   widget.docId,
+                                nom:         widget.nom,
+                                prix:        widget.prix,
+                                quantite:    1,
+                                imageUrl:    widget.imageUrls.isNotEmpty
+                                    ? widget.imageUrls.first
+                                    : null,
+                                commerceId:  widget.commerce.id ?? '',
+                                commerceNom: widget.commerce.nomBoutique,
                               ),
-                            ),
-                          );
+                            ],
+                            total: widget.prix,
+                          ));
                         },
                         icon: const Icon(Icons.local_shipping_outlined, size: 18),
                         label: const Text('Commander'),
