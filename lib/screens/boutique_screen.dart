@@ -15,6 +15,7 @@ import '../services/commerce_service.dart';
 import '../services/mobile_money_service.dart';
 import '../services/report_service.dart';
 import '../services/review_service.dart';
+import '../services/social_auth_service.dart';
 import '../theme/app_colors.dart';
 import 'product_detail_screen.dart';
 
@@ -90,6 +91,7 @@ class _BoutiqueScreenState extends State<BoutiqueScreen> {
 
   void _showReviewSheet(
       BuildContext context, Map<String, dynamic>? existing) {
+    if (!SocialAuthService.requireAccount(context)) return;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,

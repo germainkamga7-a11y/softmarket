@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart' show Share;
 import '../services/cart_service.dart';
 import '../services/commerce_service.dart';
 import '../services/report_service.dart';
+import '../services/social_auth_service.dart';
 import '../theme/app_colors.dart';
 import 'boutique_screen.dart';
 import 'cart_screen.dart';
@@ -370,6 +371,7 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
               width: double.infinity,
               child: FilledButton.icon(
                 onPressed: () {
+                  if (!SocialAuthService.requireAccount(context)) return;
                   final cart = context.read<CartService>();
                   cart.addItem(CartItem(
                     productId: widget.docId,
@@ -441,6 +443,7 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
                       flex: 2,
                       child: FilledButton.icon(
                         onPressed: () {
+                          if (!SocialAuthService.requireAccount(context)) return;
                           Navigator.pop(context);
                           Navigator.push(
                             context,
@@ -500,6 +503,7 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
                     Expanded(
                       child: FilledButton.icon(
                         onPressed: () {
+                          if (!SocialAuthService.requireAccount(context)) return;
                           Navigator.push(
                             context,
                             MaterialPageRoute(

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 /// Résultat d'une connexion sociale
 enum SocialAuthResult { success, cancelled, error }
@@ -56,6 +57,74 @@ class SocialAuthService {
     );
 
     return SocialAuthResult.success;
+  }
+
+  // ─── Guard : compte requis ───────────────────────────────────────────────────
+
+  /// Retourne `true` si l'utilisateur a un compte réel.
+  /// Affiche un bottom sheet et retourne `false` si c'est un compte anonyme.
+  static bool requireAccount(BuildContext context) {
+    final user = _auth.currentUser;
+    if (user != null && !user.isAnonymous) return true;
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40, height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const Icon(Icons.lock_outline, size: 48, color: Color(0xFFCC0000)),
+            const SizedBox(height: 16),
+            const Text(
+              'Compte requis',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Créez un compte pour accéder à cette fonctionnalité et profiter de toutes les options de CamerMarket.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  // Déconnecte le visiteur et renvoie à l'écran de connexion
+                  _auth.signOut();
+                },
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFFCC0000),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('Créer un compte / Se connecter'),
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Continuer en mode visiteur'),
+            ),
+          ],
+        ),
+      ),
+    );
+    return false;
   }
 
   // ─── Création profil Firestore (si absent) ───────────────────────────────────

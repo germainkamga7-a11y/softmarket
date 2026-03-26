@@ -13,6 +13,7 @@ import '../services/cart_service.dart';
 import '../services/map_service.dart';
 import '../services/commerce_service.dart';
 import '../services/favorite_service.dart';
+import '../services/social_auth_service.dart';
 import '../theme/app_colors.dart';
 import 'add_boutique_screen.dart';
 import 'boutique_screen.dart';
@@ -347,6 +348,7 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
   // ─── Flow "Ajouter un commerce" ───────────────────────────────────────────
 
   Future<void> _startAddCommerce() async {
+    if (!SocialAuthService.requireAccount(context)) return;
     await Navigator.of(context).push<bool>(
       MaterialPageRoute(builder: (_) => const AddBoutiqueScreen()),
     );
