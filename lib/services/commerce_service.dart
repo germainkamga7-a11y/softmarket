@@ -18,6 +18,8 @@ class Commerce {
   final CommerceType type;
   final String? logoUrl;
   final bool verified;
+  final String numeroMobileMoney;   // numéro MTN/Orange MoMo du vendeur
+  final String operateurMobileMoney; // 'MTN' | 'Orange' | ''
 
   static const List<String> categoriesBoutique = [
     'Alimentation & Épicerie',
@@ -93,6 +95,8 @@ class Commerce {
     this.type = CommerceType.boutique,
     this.logoUrl,
     this.verified = false,
+    this.numeroMobileMoney = '',
+    this.operateurMobileMoney = '',
   });
 
   String get typeLabel =>
@@ -114,6 +118,8 @@ class Commerce {
         'created_at': Timestamp.fromDate(createdAt),
         'verified': false,
         if (logoUrl != null) 'logo_url': logoUrl,
+        if (numeroMobileMoney.isNotEmpty) 'numero_mobile_money': numeroMobileMoney,
+        if (operateurMobileMoney.isNotEmpty) 'operateur_mobile_money': operateurMobileMoney,
       };
 
   factory Commerce.fromDoc(DocumentSnapshot doc) {
@@ -136,6 +142,8 @@ class Commerce {
       createdAt: (data['created_at'] as Timestamp).toDate(),
       logoUrl: data['logo_url'] as String?,
       verified: data['verified'] as bool? ?? false,
+      numeroMobileMoney: data['numero_mobile_money'] as String? ?? '',
+      operateurMobileMoney: data['operateur_mobile_money'] as String? ?? '',
     );
   }
 
@@ -145,6 +153,8 @@ class Commerce {
     String? categorie,
     String? telephone,
     String? logoUrl,
+    String? numeroMobileMoney,
+    String? operateurMobileMoney,
   }) =>
       Commerce(
         id: id,
@@ -159,6 +169,8 @@ class Commerce {
         position: position,
         createdAt: createdAt,
         logoUrl: logoUrl ?? this.logoUrl,
+        numeroMobileMoney: numeroMobileMoney ?? this.numeroMobileMoney,
+        operateurMobileMoney: operateurMobileMoney ?? this.operateurMobileMoney,
       );
 }
 
@@ -208,6 +220,8 @@ class CommerceService {
     required String categorie,
     required String telephone,
     String? logoUrl,
+    String numeroMobileMoney = '',
+    String operateurMobileMoney = '',
   }) async {
     final data = {
       'nom_boutique': nomBoutique,
@@ -215,6 +229,8 @@ class CommerceService {
       'categorie': categorie,
       'telephone': telephone,
       if (logoUrl != null) 'logo_url': logoUrl,
+      'numero_mobile_money': numeroMobileMoney,
+      'operateur_mobile_money': operateurMobileMoney,
     };
     await _db.collection(_collection).doc(id).update(data)
         .timeout(const Duration(seconds: 12));

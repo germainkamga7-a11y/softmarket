@@ -12,6 +12,7 @@ import 'screens/camer_market_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'firebase_options.dart';
+import 'services/analytics_service.dart';
 import 'services/cart_service.dart';
 import 'services/notification_service.dart';
 
@@ -117,6 +118,7 @@ class _SoftMarketAppState extends State<SoftMarketApp> {
       themeMode: ThemeMode.system,
       scaffoldMessengerKey: scaffoldMessengerKey,
       navigatorKey: navigatorKey,
+      navigatorObservers: [AnalyticsService.observer],
       home: const _AuthGate(),
       // Sur desktop web : centrer le contenu dans un cadre mobile (430px max)
       builder: kIsWeb

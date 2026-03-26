@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../services/analytics_service.dart';
 import '../services/cart_service.dart';
 import '../theme/app_colors.dart';
 import 'order_checkout_screen.dart';
@@ -276,15 +277,18 @@ class _CartSummary extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => OrderCheckoutScreen(
-                    items: List.of(cart.items),
-                    total: cart.totalAmount,
+              onPressed: () {
+                AnalyticsService.logBeginCheckout(total: cart.totalAmount);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => OrderCheckoutScreen(
+                      items: List.of(cart.items),
+                      total: cart.totalAmount,
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
               icon: const Icon(Icons.local_shipping_outlined, size: 18),
               label: const Text('Commander — Paiement à la livraison'),
               style: FilledButton.styleFrom(

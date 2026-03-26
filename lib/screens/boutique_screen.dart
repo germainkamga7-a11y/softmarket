@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart' show Share;
 import 'package:url_launcher/url_launcher.dart';
 
+import '../services/analytics_service.dart';
 import '../services/commerce_service.dart';
 import '../services/mobile_money_service.dart';
 import '../services/report_service.dart';
@@ -47,6 +48,11 @@ class _BoutiqueScreenState extends State<BoutiqueScreen> {
         .where('commerce_id', isEqualTo: widget.commerce.id)
         .orderBy('created_at', descending: true)
         .snapshots();
+    AnalyticsService.logViewBoutique(
+      commerceId: widget.commerce.id ?? '',
+      nom: widget.commerce.nomBoutique,
+      categorie: widget.commerce.categorie,
+    );
   }
 
   Future<void> _updateLogo() async {
@@ -413,6 +419,42 @@ class _BoutiqueScreenState extends State<BoutiqueScreen> {
                       ),
                     ],
                   ),
+                  // Numéro Mobile Money du vendeur
+                  if (widget.commerce.numeroMobileMoney.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: widget.commerce.operateurMobileMoney == 'MTN'
+                            ? const Color(0xFFFFF8E1)
+                            : const Color(0xFFFFF3E0),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: widget.commerce.operateurMobileMoney == 'MTN'
+                              ? const Color(0xFFFFB300)
+                              : Colors.orange,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.account_balance_wallet_outlined,
+                            size: 16,
+                            color: widget.commerce.operateurMobileMoney == 'MTN'
+                                ? const Color(0xFFFF8F00)
+                                : Colors.deepOrange,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${widget.commerce.operateurMobileMoney} MoMo : ${widget.commerce.numeroMobileMoney}',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w600, fontSize: 13),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
                   Divider(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
                 ],

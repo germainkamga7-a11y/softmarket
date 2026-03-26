@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
+import '../services/analytics_service.dart';
 import '../services/cart_service.dart';
 import '../services/order_service.dart';
 import '../theme/app_colors.dart';
@@ -68,6 +69,12 @@ class _OrderCheckoutScreenState extends State<OrderCheckoutScreen> {
       );
 
       if (!mounted) return;
+
+      AnalyticsService.logPurchase(
+        orderId: orderId,
+        total: widget.total,
+        modePaiement: 'livraison',
+      );
 
       // Vider le panier
       context.read<CartService>().clear();

@@ -127,8 +127,10 @@ class _BoutiqueFormScreenState extends State<_BoutiqueFormScreen> {
   final _nomCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   final _telCtrl = TextEditingController();
+  final _momoCtrl = TextEditingController();
   final _autreCtrl = TextEditingController();
   late String _categorie;
+  String _operateurMomo = ''; // '' | 'MTN' | 'Orange'
   bool _loading = false;
   bool _is3D = false;
   bool _locating = false;
@@ -163,6 +165,8 @@ class _BoutiqueFormScreenState extends State<_BoutiqueFormScreen> {
       _nomCtrl.text = widget.boutique!.nomBoutique;
       _descCtrl.text = widget.boutique!.description;
       _telCtrl.text = widget.boutique!.telephone;
+      _momoCtrl.text = widget.boutique!.numeroMobileMoney;
+      _operateurMomo = widget.boutique!.operateurMobileMoney;
       _categorie = _categories.contains(widget.boutique!.categorie)
           ? widget.boutique!.categorie
           : _categories.first;
@@ -217,6 +221,7 @@ class _BoutiqueFormScreenState extends State<_BoutiqueFormScreen> {
     _nomCtrl.dispose();
     _descCtrl.dispose();
     _telCtrl.dispose();
+    _momoCtrl.dispose();
     _autreCtrl.dispose();
     // Ne pas appeler _mapController?.dispose() — géré en interne par GoogleMap
     super.dispose();
@@ -299,6 +304,8 @@ class _BoutiqueFormScreenState extends State<_BoutiqueFormScreen> {
           categorie: _categorieFinale,
           telephone: _telCtrl.text.trim(),
           logoUrl: logoUrl,
+          numeroMobileMoney: _momoCtrl.text.trim(),
+          operateurMobileMoney: _operateurMomo,
         );
       } else {
         final id = await service.saveBoutique(
@@ -311,18 +318,18 @@ class _BoutiqueFormScreenState extends State<_BoutiqueFormScreen> {
           type: widget.type,
           position: _position!,
         );
-        // Upload logo après création (on a besoin de l'ID)
-        if (_logoFile != null) {
-          final logoUrl = await _uploadLogo(id);
-          if (logoUrl != null) {
-            await service.updateBoutique(id,
-              nomBoutique: _nomCtrl.text.trim(),
-              description: _descCtrl.text.trim(),
-              categorie: _categorieFinale,
-              telephone: _telCtrl.text.trim(),
-              logoUrl: logoUrl,
-            );
-          }
+        // Upload logo + mobile money après création (on a besoin de l'ID)
+        if (_logoFile != null || _momoCtrl.text.trim().isNotEmpty) {
+          final logoUrl = _logoFile != null ? await _uploadLogo(id) : null;
+          await service.updateBoutique(id,
+            nomBoutique: _nomCtrl.text.trim(),
+            description: _descCtrl.text.trim(),
+            categorie: _categorieFinale,
+            telephone: _telCtrl.text.trim(),
+            logoUrl: logoUrl,
+            numeroMobileMoney: _momoCtrl.text.trim(),
+            operateurMobileMoney: _operateurMomo,
+          );
         }
       }
 
@@ -542,6 +549,46 @@ class _BoutiqueFormScreenState extends State<_BoutiqueFormScreen> {
                     borderRadius: BorderRadius.circular(12)),
               ),
             ),
+            const SizedBox(height: 16),
+
+            // ─── Mobile Money ──────────────────────────────────────────────
+            Text('Mobile Money (optionnel)',
+                style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface)),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                // Sélecteur opérateur
+                for (final op in ['MTN', 'Orange'])
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      label: Text(op),
+                      selected: _operateurMomo == op,
+                      selectedColor: op == 'MTN'
+                          ? const Color(0xFFFFB300)
+                          : Colors.orange,
+                      onSelected: (sel) => setState(() =>
+                          _operateurMomo = sel ? op : ''),
+                    ),
+                  ),
+              ],
+            ),
+            if (_operateurMomo.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _momoCtrl,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                  labelText: 'Numéro $_operateurMomo MoMo',
+                  hintText: '6XX XXX XXX',
+                  prefixIcon: const Icon(Icons.account_balance_wallet_outlined),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ],
             const SizedBox(height: 20),
 
             // ─── Localisation ──────────────────────────────────────────────
