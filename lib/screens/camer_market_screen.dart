@@ -875,6 +875,7 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
           return const Center(child: CircularProgressIndicator());
         }
         final initialPos = snapshot.data!;
+        final colorScheme = Theme.of(context).colorScheme;
         return Stack(
           children: [
             // ── Carte 3D ──
@@ -931,19 +932,18 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                           setState(() => _selectedMapCategory = null);
                           _updateMapMarkers();
                         },
-                        backgroundColor: Colors.white,
-                        selectedColor: Colors.blue.shade100,
-                        checkmarkColor: Colors.blue,
+                        backgroundColor: colorScheme.surface,
+                        selectedColor: colorScheme.primaryContainer,
+                        checkmarkColor: colorScheme.primary,
                         labelStyle: TextStyle(
                           color: _selectedMapCategory == null
-                              ? Colors.blue
-                              : Colors.black87,
+                              ? colorScheme.primary
+                              : colorScheme.onSurface,
                           fontWeight: _selectedMapCategory == null
                               ? FontWeight.bold
                               : FontWeight.normal,
                         ),
                         elevation: 2,
-                        shadowColor: Colors.black26,
                       ),
                     ),
                     ..._mapCategories.map((cat) => Padding(
@@ -956,19 +956,18 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                                   _selectedMapCategory == cat ? null : cat);
                               _updateMapMarkers();
                             },
-                            backgroundColor: Colors.white,
-                            selectedColor: Colors.blue.shade100,
-                            checkmarkColor: Colors.blue,
+                            backgroundColor: colorScheme.surface,
+                            selectedColor: colorScheme.primaryContainer,
+                            checkmarkColor: colorScheme.primary,
                             labelStyle: TextStyle(
                               color: _selectedMapCategory == cat
-                                  ? Colors.blue
-                                  : Colors.black87,
+                                  ? colorScheme.primary
+                                  : colorScheme.onSurface,
                               fontWeight: _selectedMapCategory == cat
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                             ),
                             elevation: 2,
-                            shadowColor: Colors.black26,
                           ),
                         )),
                   ],
@@ -988,8 +987,8 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     color: _activeFilterCount > 0
-                        ? Colors.blue
-                        : Colors.white,
+                        ? colorScheme.primary
+                        : colorScheme.surface,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: const [
                       BoxShadow(color: Colors.black26, blurRadius: 4)
@@ -1001,8 +1000,8 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                       Icon(Icons.tune,
                           size: 16,
                           color: _activeFilterCount > 0
-                              ? Colors.white
-                              : Colors.black87),
+                              ? colorScheme.onPrimary
+                              : colorScheme.onSurface),
                       const SizedBox(width: 4),
                       Text(
                         _activeFilterCount > 0
@@ -1012,8 +1011,8 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: _activeFilterCount > 0
-                              ? Colors.white
-                              : Colors.black87,
+                              ? colorScheme.onPrimary
+                              : colorScheme.onSurface,
                         ),
                       ),
                     ],
@@ -1133,8 +1132,8 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                 children: [
                   FloatingActionButton.small(
                     heroTag: 'map_type',
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black87,
+                    backgroundColor: colorScheme.surface,
+                    foregroundColor: colorScheme.onSurface,
                     onPressed: () {
                       setState(() {
                         _mapType = _mapType == MapType.normal
@@ -1204,11 +1203,11 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                               width: 200,
                               margin: const EdgeInsets.only(right: 10),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: colorScheme.surface,
                                 borderRadius: BorderRadius.circular(16),
                                 border: isOwner
                                     ? Border.all(
-                                        color: Colors.blue, width: 2)
+                                        color: colorScheme.primary, width: 2)
                                     : null,
                                 boxShadow: const [
                                   BoxShadow(
@@ -1252,7 +1251,7 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                                     item.commerce.categorie,
                                     style: TextStyle(
                                         fontSize: 11,
-                                        color: Colors.grey[600]),
+                                        color: colorScheme.onSurfaceVariant),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
