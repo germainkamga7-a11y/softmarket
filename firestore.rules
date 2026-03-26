@@ -24,7 +24,7 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isAuth();
       allow create: if isOwner(userId)
-        && hasFields(['username', 'phone', 'created_at']);
+        && hasFields(['username', 'created_at']);
       allow update: if isOwner(userId)
         && notChanging(['phone', 'created_at']);
       allow delete: if isOwner(userId);
@@ -113,6 +113,43 @@ service cloud.firestore {
           && hasFields(['text', 'sender_id', 'created_at']);
         allow update, delete: if false;
       }
+    }
+
+    // ── Commandes ─────────────────────────────────────────────────────────────
+
+    // Vérifie que le commerce concerné appartient à l'utilisateur connecté
+    function isSellerOfOrder() {
+      return isAuth() &&
+        resource.data.items.size() > 0 &&
+        get(/databases/$(database)/documents/commercants/$(resource.data.items[0].commerceId))
+          .data.user_id == request.auth.uid;
+    }
+
+    // Transitions de statut autorisées pour le vendeur
+    function isValidSellerTransition() {
+      return (resource.data.statut == 'en_attente'   && request.resource.data.statut == 'confirmee')
+          || (resource.data.statut == 'confirmee'    && request.resource.data.statut == 'en_livraison')
+          || (resource.data.statut == 'en_livraison' && request.resource.data.statut == 'livree');
+    }
+
+    match /commandes/{commandeId} {
+      // L'acheteur peut créer et lire ses propres commandes
+      allow create: if isAuth()
+        && request.resource.data.userId == request.auth.uid
+        && hasFields(['userId', 'items', 'total', 'adresseLivraison', 'telephone', 'statut', 'createdAt']);
+      allow read: if isAuth()
+        && (resource.data.userId == request.auth.uid || isSellerOfOrder());
+      // Acheteur : annuler si en_attente
+      allow update: if isAuth()
+        && resource.data.userId == request.auth.uid
+        && resource.data.statut == 'en_attente'
+        && request.resource.data.statut == 'annulee'
+        && notChanging(['userId', 'items', 'total', 'createdAt']);
+      // Vendeur : faire avancer le statut (confirmee → en_livraison → livree)
+      allow update: if isSellerOfOrder()
+        && isValidSellerTransition()
+        && notChanging(['userId', 'items', 'total', 'adresseLivraison', 'telephone', 'createdAt', 'modePaiement']);
+      allow delete: if false;
     }
 
     // ── Signalements ──────────────────────────────────────────────────────────

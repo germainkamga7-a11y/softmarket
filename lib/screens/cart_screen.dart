@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/cart_service.dart';
-import '../services/mobile_money_service.dart';
 import '../theme/app_colors.dart';
+import 'order_checkout_screen.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -245,13 +245,6 @@ class _CartSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Regroupe les vendeurs pour choisir un destinataire MoMo
-    final sellers = <String, String>{};
-    for (final item in cart.items) {
-      sellers[item.commerceId] = item.commerceNom;
-    }
-    final multiSeller = sellers.length > 1;
-
     return Container(
       padding: EdgeInsets.fromLTRB(
           16, 16, 16, MediaQuery.of(context).padding.bottom + 16),
@@ -279,54 +272,24 @@ class _CartSummary extends StatelessWidget {
               ),
             ],
           ),
-          if (multiSeller) ...[
-            const SizedBox(height: 6),
-            Text(
-              '${sellers.length} vendeurs différents — paiement séparé recommandé',
-              style: TextStyle(
-                  fontSize: 11, color: colorScheme.onSurfaceVariant),
-              textAlign: TextAlign.center,
-            ),
-          ],
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
-              onPressed: () {
-                // Si un seul vendeur, pré-remplit MoMo avec son numéro
-                if (!multiSeller) {
-                  showMobileMoneySheet(
-                    context,
-                    commerce: _FakeCommerce(
-                      telephone: '',
-                      nomBoutique: sellers.values.first,
-                    ),
-                    amount: cart.totalAmount,
-                    productName:
-                        '${cart.itemCount} article${cart.itemCount > 1 ? 's' : ''}',
-                  );
-                } else {
-                  // Multi-vendeur : on ouvre juste le sheet avec le total
-                  showMobileMoneySheet(
-                    context,
-                    commerce: const _FakeCommerce(
-                      telephone: '',
-                      nomBoutique: 'Vendeurs multiples',
-                    ),
-                    amount: cart.totalAmount,
-                    productName:
-                        '${cart.itemCount} article${cart.itemCount > 1 ? 's' : ''}',
-                  );
-                }
-              },
-              icon: const Icon(Icons.mobile_friendly, size: 18),
-              label: const Text('Commander en Mobile Money'),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => OrderCheckoutScreen(
+                    items: List.of(cart.items),
+                    total: cart.totalAmount,
+                  ),
+                ),
+              ),
+              icon: const Icon(Icons.local_shipping_outlined, size: 18),
+              label: const Text('Commander — Paiement à la livraison'),
               style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFFFFB300),
-                foregroundColor: Colors.black87,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape:
-                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
           ),
@@ -334,11 +297,4 @@ class _CartSummary extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Objet minimaliste passé à showMobileMoneySheet
-class _FakeCommerce {
-  final String telephone;
-  final String nomBoutique;
-  const _FakeCommerce({required this.telephone, required this.nomBoutique});
 }

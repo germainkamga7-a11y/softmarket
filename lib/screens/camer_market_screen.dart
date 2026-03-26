@@ -19,6 +19,7 @@ import 'boutique_screen.dart';
 import 'cart_screen.dart';
 import 'chat_screen.dart';
 import 'favorites_screen.dart';
+import 'orders_list_screen.dart';
 import 'profile_screen.dart';
 import 'product_detail_screen.dart';
 import 'search_screen.dart';
@@ -280,19 +281,26 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    final isAnonymous = FirebaseAuth.instance.currentUser?.isAnonymous ?? false;
+
     return Scaffold(
       backgroundColor: colorScheme.surface,
+      // Bandeau visiteur anonyme
+      bottomSheet: isAnonymous
+          ? _AnonBanner()
+          : null,
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          _buildHomeTab(colorScheme, textTheme),
           _buildMapTab(),
+          _buildHomeTab(colorScheme, textTheme),
+          const OrdersListScreen(),
           _buildFavoritesTab(colorScheme, textTheme),
           _buildProfileTab(colorScheme, textTheme),
         ],
       ),
       // FAB "Ajouter un commerce" visible uniquement sur l'onglet carte
-      floatingActionButton: _selectedIndex == 1
+      floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton.extended(
               heroTag: 'add_commerce',
               onPressed: _startAddCommerce,
@@ -307,14 +315,19 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
             setState(() => _selectedIndex = index),
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Accueil',
-          ),
-          NavigationDestination(
             icon: Icon(Icons.map_outlined),
             selectedIcon: Icon(Icons.map),
             label: 'Carte',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'Explorer',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.receipt_long_outlined),
+            selectedIcon: Icon(Icons.receipt_long),
+            label: 'Commandes',
           ),
           NavigationDestination(
             icon: Icon(Icons.favorite_outline),
@@ -1851,6 +1864,52 @@ class _ProductHorizontalCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Bandeau visiteur anonyme ─────────────────────────────────────────────────
+
+class _AnonBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Material(
+      color: colorScheme.primaryContainer,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(
+            children: [
+              Icon(Icons.person_off_outlined,
+                  size: 18, color: colorScheme.onPrimaryContainer),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Mode visiteur — Créez un compte pour commander',
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.w500),
+                ),
+              ),
+              TextButton(
+                onPressed: () => FirebaseAuth.instance.signOut(),
+                style: TextButton.styleFrom(
+                  foregroundColor: colorScheme.onPrimaryContainer,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: const Text('Créer un compte',
+                    style: TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
         ),
       ),
     );

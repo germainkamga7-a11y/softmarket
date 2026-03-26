@@ -5,12 +5,12 @@ import 'package:share_plus/share_plus.dart' show Share;
 
 import '../services/cart_service.dart';
 import '../services/commerce_service.dart';
-import '../services/mobile_money_service.dart';
 import '../services/report_service.dart';
 import '../theme/app_colors.dart';
 import 'boutique_screen.dart';
 import 'cart_screen.dart';
 import 'chat_screen.dart';
+import 'order_checkout_screen.dart';
 
 // ─── Fonction globale : ouvrir le détail produit en popup ─────────────────────
 
@@ -473,7 +473,7 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                // Rangée 2 : Partager + Payer MoMo
+                // Rangée 2 : Partager + Commander maintenant
                 Row(
                   children: [
                     Expanded(
@@ -482,7 +482,7 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
                           final imageUrl = widget.imageUrls.isNotEmpty
                               ? widget.imageUrls.first
                               : '';
-                          final text = '🛒 ${widget.nom} — '
+                          final text = '${widget.nom} — '
                               '${widget.prix.round()} FCFA\n'
                               'Vendu par ${widget.commerce.nomBoutique} sur CamerMarket'
                               '${imageUrl.isNotEmpty ? '\n$imageUrl' : ''}';
@@ -499,17 +499,32 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: FilledButton.icon(
-                        onPressed: () => showMobileMoneySheet(
-                          context,
-                          commerce: widget.commerce,
-                          amount: widget.prix,
-                          productName: widget.nom,
-                        ),
-                        icon: const Icon(Icons.mobile_friendly, size: 18),
-                        label: const Text('MoMo'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => OrderCheckoutScreen(
+                                items: [
+                                  CartItem(
+                                    productId:   widget.docId,
+                                    nom:         widget.nom,
+                                    prix:        widget.prix,
+                                    quantite:    1,
+                                    imageUrl:    widget.imageUrls.isNotEmpty
+                                        ? widget.imageUrls.first
+                                        : null,
+                                    commerceId:  widget.commerce.id ?? '',
+                                    commerceNom: widget.commerce.nomBoutique,
+                                  ),
+                                ],
+                                total: widget.prix,
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.local_shipping_outlined, size: 18),
+                        label: const Text('Commander'),
                         style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFFFFB300),
-                          foregroundColor: Colors.black87,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),

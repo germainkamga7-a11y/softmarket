@@ -14,6 +14,7 @@ import 'add_boutique_screen.dart';
 import 'boutique_screen.dart';
 import 'conversations_screen.dart';
 import 'help_screen.dart';
+import 'orders_list_screen.dart';
 import 'notifications_screen.dart';
 import 'privacy_policy_screen.dart';
 import 'security_screen.dart';
@@ -455,6 +456,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 MaterialPageRoute(builder: (_) => const ConversationsScreen())),
                             shape: const RoundedRectangleBorder(
                                 borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+                          ),
+                          Divider(height: 1, indent: 56, color: colorScheme.outlineVariant),
+                          ListTile(
+                            leading: Icon(Icons.receipt_long_outlined, color: colorScheme.primary),
+                            title: const Text('Mes commandes'),
+                            trailing: const Icon(Icons.chevron_right),
+                            onTap: () => Navigator.push(context,
+                                MaterialPageRoute(builder: (_) => const OrdersListScreen())),
                           ),
                           Divider(height: 1, indent: 56, color: colorScheme.outlineVariant),
                           ListTile(
