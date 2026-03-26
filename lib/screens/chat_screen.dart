@@ -399,8 +399,8 @@ class _MessageBubble extends StatelessWidget {
                           ),
                           child: Text(
                             '${prix.toStringAsFixed(0)} FCFA',
-                            style: const TextStyle(
-                              color: AppColors.priceText,
+                            style: TextStyle(
+                              color: AppColors.priceColor(context),
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
                             ),

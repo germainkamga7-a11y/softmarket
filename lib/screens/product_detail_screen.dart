@@ -84,7 +84,8 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
     final textTheme = Theme.of(context).textTheme;
     final isService = widget.commerce.type == CommerceType.etablissement;
     final accentColor = isService ? AppColors.etablissement : AppColors.boutique;
-    final accentLight = isService ? AppColors.etablissementLight : AppColors.boutiqueLight;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentLight = AppColors.lightForType(widget.commerce.type, dark: isDark);
     final typeLabel = isService ? 'Service' : 'Produit';
 
     return Container(
@@ -268,7 +269,7 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
                               child: Text(
                                 '${widget.prix.toStringAsFixed(0)} FCFA',
                                 style: textTheme.titleSmall?.copyWith(
-                                  color: AppColors.priceText,
+                                  color: AppColors.priceColor(context),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

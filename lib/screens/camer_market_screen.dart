@@ -1429,7 +1429,7 @@ class _MarketCard extends StatelessWidget {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: AppColors.lightForType(commerce.type),
+                  color: AppColors.lightForType(commerce.type, dark: Theme.of(context).brightness == Brightness.dark),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 alignment: Alignment.center,
@@ -1483,7 +1483,7 @@ class _MarketCard extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppColors.lightForType(commerce.type),
+                            color: AppColors.lightForType(commerce.type, dark: Theme.of(context).brightness == Brightness.dark),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -1745,7 +1745,8 @@ class _ProductHorizontalCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final isService = commerce?.type == CommerceType.etablissement;
     final accent = isService ? AppColors.etablissement : AppColors.boutique;
-    final accentLight = isService ? AppColors.etablissementLight : AppColors.boutiqueLight;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentLight = isService ? AppColors.lightForType(CommerceType.etablissement, dark: isDark) : AppColors.lightForType(CommerceType.boutique, dark: isDark);
     final typeLabel = isService ? 'Service' : 'Produit';
     final typeIcon = isService ? Icons.design_services : Icons.inventory_2_outlined;
     final firstImage = imageUrls.isNotEmpty ? imageUrls.first : null;
@@ -1834,7 +1835,7 @@ class _ProductHorizontalCard extends StatelessWidget {
                     child: Text(
                       '${prix.toStringAsFixed(0)} FCFA',
                       style: textTheme.labelSmall?.copyWith(
-                        color: AppColors.priceText,
+                        color: AppColors.priceColor(context),
                         fontWeight: FontWeight.bold,
                       ),
                     ),

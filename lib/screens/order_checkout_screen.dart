@@ -159,7 +159,7 @@ class _OrderCheckoutScreenState extends State<OrderCheckoutScreen> {
                       Text('${(item.prix * item.quantite).round()} FCFA',
                           style: textTheme.bodySmall?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: AppColors.priceText)),
+                              color: AppColors.priceColor(context))),
                     ],
                   ),
                 ],
@@ -176,7 +176,7 @@ class _OrderCheckoutScreenState extends State<OrderCheckoutScreen> {
                 Text('${widget.total.round()} FCFA',
                     style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.priceText)),
+                        color: AppColors.priceColor(context))),
               ],
             ),
 

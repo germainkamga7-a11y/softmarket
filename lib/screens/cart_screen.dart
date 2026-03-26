@@ -156,10 +156,10 @@ class _CartItemTile extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       '${(item.prix * item.quantite).round()} FCFA',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
-                        color: AppColors.priceText,
+                        color: AppColors.priceColor(context),
                       ),
                     ),
                   ],
@@ -265,10 +265,10 @@ class _CartSummary extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.w600)),
               Text(
                 '${cart.totalAmount.round()} FCFA',
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
-                  color: AppColors.priceText,
+                  color: AppColors.priceColor(context),
                 ),
               ),
             ],

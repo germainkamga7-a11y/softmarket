@@ -172,11 +172,11 @@ class _OrderCard extends StatelessWidget {
               // Ligne 3 : total + flèche
               Row(
                 children: [
-                  const Icon(Icons.payments_outlined, size: 16, color: AppColors.priceText),
+                  Icon(Icons.payments_outlined, size: 16, color: AppColors.priceColor(context)),
                   const SizedBox(width: 6),
                   Text('${order.total.round()} FCFA',
                       style: textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold, color: AppColors.priceText)),
+                          fontWeight: FontWeight.bold, color: AppColors.priceColor(context))),
                   const Spacer(),
                   Icon(Icons.arrow_forward_ios_outlined,
                       size: 14, color: colorScheme.onSurfaceVariant),

@@ -139,7 +139,7 @@ class _OrderBody extends StatelessWidget {
                       style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
                   Text('${(item.prix * item.quantite).round()} FCFA',
                       style: textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.bold, color: AppColors.priceText)),
+                          fontWeight: FontWeight.bold, color: AppColors.priceColor(context))),
                 ],
               ),
             ],
@@ -177,7 +177,7 @@ class _OrderBody extends StatelessWidget {
             Text('Total', style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
             Text('${order.total.round()} FCFA',
                 style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold, color: AppColors.priceText)),
+                    fontWeight: FontWeight.bold, color: AppColors.priceColor(context))),
           ],
         ),
 

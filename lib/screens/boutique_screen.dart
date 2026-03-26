@@ -1489,7 +1489,10 @@ class _ProduitCardState extends State<_ProduitCard> {
 
   // Couleurs selon type (produit=bleu, service=vert)
   Color get _accent => AppColors.forType(widget.commerce.type);
-  Color get _accentLight => AppColors.lightForType(widget.commerce.type);
+  Color _accentLight(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return AppColors.lightForType(widget.commerce.type, dark: dark);
+  }
   bool get _isService => widget.commerce.type == CommerceType.etablissement;
 
   @override
@@ -1533,7 +1536,7 @@ class _ProduitCardState extends State<_ProduitCard> {
                   // Image(s)
                   widget.imageUrls.isEmpty
                       ? Container(
-                          color: _accentLight,
+                          color: _accentLight(context),
                           child: Icon(
                             _isService ? Icons.design_services_outlined : Icons.inventory_2_outlined,
                             size: 36,
@@ -1547,14 +1550,14 @@ class _ProduitCardState extends State<_ProduitCard> {
                             imageUrl: widget.imageUrls[i],
                             fit: BoxFit.cover,
                             placeholder: (_, __) => Container(
-                              color: _accentLight,
+                              color: _accentLight(context),
                               child: Center(
                                 child: CircularProgressIndicator(
                                     strokeWidth: 2, color: _accent),
                               ),
                             ),
                             errorWidget: (_, __, ___) => Container(
-                              color: _accentLight,
+                              color: _accentLight(context),
                               child: Icon(_isService ? Icons.design_services_outlined : Icons.inventory_2_outlined,
                                   size: 36, color: _accent.withValues(alpha: 0.4)),
                             ),
@@ -1721,8 +1724,8 @@ class _ProduitCardState extends State<_ProduitCard> {
                           ),
                           child: Text(
                             '${widget.prix.toStringAsFixed(0)} FCFA',
-                            style: const TextStyle(
-                              color: AppColors.priceText,
+                            style: TextStyle(
+                              color: AppColors.priceColor(context),
                               fontWeight: FontWeight.bold,
                               fontSize: 11,
                             ),

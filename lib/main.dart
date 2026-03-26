@@ -46,6 +46,12 @@ void main() async {
     };
   }
 
+  // Offline support : cache Firestore illimité — critique pour réseau camerounais
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+  );
+
   // Ne pas bloquer runApp() sur l'init des notifications (évite le freeze sur web)
   NotificationService.initialize().catchError(
     (e) => debugPrint('[FCM] Init ignorée : $e'),
@@ -104,15 +110,39 @@ class _SoftMarketAppState extends State<SoftMarketApp> {
           brightness: Brightness.dark,
           primary: const Color(0xFFCC0000),
           secondary: const Color(0xFFFFB300),
-          surface: const Color(0xFF1A1A1A),
+          surface: const Color(0xFF121212),
           onPrimary: Colors.white,
+          onSecondary: Colors.black,
         ),
         useMaterial3: true,
         fontFamily: 'Roboto',
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF1A1A1A),
+          backgroundColor: Color(0xFFCC0000),
           foregroundColor: Colors.white,
           elevation: 0,
+          scrolledUnderElevation: 2,
+        ),
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
+            backgroundColor: const Color(0xFFCC0000),
+            foregroundColor: Colors.white,
+          ),
+        ),
+        cardTheme: const CardThemeData(
+          color: Color(0xFF1E1E1E),
+          elevation: 0,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xFF2A2A2A),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFF3A3A3A)),
+          ),
+        ),
+        dividerTheme: const DividerThemeData(color: Color(0xFF2A2A2A)),
+        bottomSheetTheme: const BottomSheetThemeData(
+          backgroundColor: Color(0xFF1E1E1E),
         ),
       ),
       themeMode: ThemeMode.system,
