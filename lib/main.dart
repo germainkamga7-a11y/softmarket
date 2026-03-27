@@ -49,10 +49,14 @@ void main() async {
   }
 
   // Offline support : cache Firestore illimité — critique pour réseau camerounais
-  FirebaseFirestore.instance.settings = const Settings(
-    persistenceEnabled: true,
-    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-  );
+  // Sur web (Safari inclus), on ne force pas la persistence : IndexedDB peut
+  // bloquer en mode privé ou avec quota Safari restreint.
+  if (!kIsWeb) {
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+    );
+  }
 
   // Ne pas bloquer runApp() sur l'init des notifications (évite le freeze sur web)
   NotificationService.initialize().catchError(

@@ -97,14 +97,19 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
   Future<void> _checkProfile() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
-    final doc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .get();
-    if (!doc.exists && mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) context.go(Routes.register);
-      });
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get()
+          .timeout(const Duration(seconds: 8));
+      if (!doc.exists && mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) context.go(Routes.register);
+        });
+      }
+    } catch (_) {
+      // Timeout ou erreur réseau : on reste sur home, pas de blocage
     }
   }
 
