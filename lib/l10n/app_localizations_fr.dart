@@ -50,7 +50,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get deliver => 'Livrer';
 
   @override
-  String get navMap => 'Carte';
+  String get navMap => 'Market';
 
   @override
   String get navHome => 'Accueil';

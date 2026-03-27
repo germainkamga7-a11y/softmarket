@@ -29,8 +29,12 @@ service cloud.firestore {
       allow read: if isAuth();
       allow create: if isOwner(userId)
         && hasFields(['username', 'created_at']);
+      // Autorise la mise à jour de tous les champs sauf phone (si déjà renseigné)
+      // et created_at. Exception : si phone est vide dans le doc existant, on
+      // peut le renseigner (cas inscription après connexion anonyme).
       allow update: if isOwner(userId)
-        && notChanging(['phone', 'created_at']);
+        && notChanging(['created_at'])
+        && (notChanging(['phone']) || resource.data.phone == '');
       allow delete: if isOwner(userId);
     }
 
@@ -154,6 +158,23 @@ service cloud.firestore {
       allow update: if isSellerOfOrder()
         && isValidSellerTransition()
         && notChanging(['userId', 'items', 'total', 'adresseLivraison', 'telephone', 'createdAt', 'modePaiement']);
+      allow delete: if false;
+    }
+
+    // ── Demandes de vérification d'identité ───────────────────────────────────
+    match /verification_requests/{userId} {
+      // L'utilisateur peut créer/remplacer sa propre demande (pending uniquement)
+      allow create: if isOwner(userId)
+        && request.resource.data.status == 'pending'
+        && hasFields(['uid', 'full_name', 'cni_number', 'cni_front_url',
+                      'selfie_url', 'submitted_at']);
+      // Renvoi après refus : replace avec status pending
+      allow update: if isOwner(userId)
+        && request.resource.data.status == 'pending'
+        && resource.data.status == 'rejected';
+      // L'utilisateur peut lire sa propre demande
+      allow read: if isOwner(userId);
+      // Approbation/refus réservés à l'admin (Firebase Console ou Cloud Function)
       allow delete: if false;
     }
 

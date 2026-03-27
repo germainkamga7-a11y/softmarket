@@ -65,14 +65,18 @@ class CartService extends ChangeNotifier {
         _items.addAll(list.map((e) => CartItem.fromJson(e as Map<String, dynamic>)));
         notifyListeners();
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[CartService] Erreur chargement panier : $e');
+    }
   }
 
   Future<void> _persist() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_key, jsonEncode(_items.map((e) => e.toJson()).toList()));
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[CartService] Erreur persistance panier : $e');
+    }
   }
 
   void addItem(CartItem item) {

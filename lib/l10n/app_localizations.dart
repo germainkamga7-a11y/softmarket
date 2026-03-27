@@ -179,7 +179,7 @@ abstract class AppLocalizations {
   /// No description provided for @navMap.
   ///
   /// In fr, this message translates to:
-  /// **'Carte'**
+  /// **'Market'**
   String get navMap;
 
   /// No description provided for @navHome.

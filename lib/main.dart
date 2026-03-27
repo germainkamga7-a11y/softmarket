@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_maps_flutter_android/google_maps_flutter_android.dart';
+import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +15,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
+import 'services/social_auth_service.dart';
 import 'providers/commerce_provider.dart';
 import 'router/app_router.dart';
 import 'services/cart_service.dart';
@@ -24,6 +27,14 @@ final navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('fr_FR');
+
+  // Initialise le renderer Google Maps sur Android
+  if (!kIsWeb) {
+    final mapsImpl = GoogleMapsFlutterPlatform.instance;
+    if (mapsImpl is GoogleMapsFlutterAndroid) {
+      await mapsImpl.initializeWithRenderer(AndroidMapRenderer.latest);
+    }
+  }
 
   try {
     await Firebase.initializeApp(
@@ -56,6 +67,14 @@ void main() async {
       persistenceEnabled: true,
       cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
     );
+  }
+
+  // Sur web : récupère le résultat du redirect Google Sign-In (Safari/iOS)
+  if (kIsWeb) {
+    SocialAuthService.handleRedirectResult().catchError((e) {
+      debugPrint('[Auth] handleRedirectResult ignoré : $e');
+      return false;
+    });
   }
 
   // Ne pas bloquer runApp() sur l'init des notifications (évite le freeze sur web)

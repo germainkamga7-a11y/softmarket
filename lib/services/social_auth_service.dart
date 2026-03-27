@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 /// Résultat d'une connexion sociale
@@ -17,8 +18,28 @@ class SocialAuthService {
         ..addScope('email')
         ..addScope('profile');
 
-      // signInWithProvider fonctionne sur web (popup) et mobile (Activity)
-      final credential = await _auth.signInWithProvider(provider);
+      UserCredential credential;
+      if (kIsWeb) {
+        // firebase_auth_web n'implémente pas signInWithProvider (throws UnimplementedError).
+        // On utilise signInWithPopup (implémenté) ; si Safari bloque la popup,
+        // on bascule sur signInWithRedirect (reload de page).
+        try {
+          credential = await _auth.signInWithPopup(provider);
+        } on FirebaseAuthException catch (popupErr) {
+          if (popupErr.code == 'popup-blocked' ||
+              popupErr.code == 'popup-closed-by-user' ||
+              popupErr.code == 'cancelled-popup-request' ||
+              popupErr.code == 'web-context-cancelled') {
+            // Safari bloque la popup → redirect (la page recharge)
+            await _auth.signInWithRedirect(provider);
+            return SocialAuthResult.cancelled; // jamais atteint
+          }
+          rethrow;
+        }
+      } else {
+        // Mobile : signInWithProvider ouvre une Activity Android / SFSafariViewController iOS
+        credential = await _auth.signInWithProvider(provider);
+      }
 
       final user = credential.user;
       if (user == null) return SocialAuthResult.error;
@@ -34,12 +55,45 @@ class SocialAuthService {
     } on FirebaseAuthException catch (e) {
       if (e.code == 'popup-closed-by-user' ||
           e.code == 'cancelled-popup-request' ||
-          e.code == 'web-context-cancelled') {
+          e.code == 'web-context-cancelled' ||
+          e.code == 'popup-blocked') {
         return SocialAuthResult.cancelled;
       }
       rethrow;
     } catch (_) {
       rethrow;
+    }
+  }
+
+  /// Crée le profil Firestore pour une inscription email/password.
+  /// Appelé depuis EmailAuthScreen juste après createUserWithEmailAndPassword.
+  static Future<void> ensureProfileFromEmail({
+    required String uid,
+    required String username,
+    required String email,
+  }) =>
+      _ensureProfile(uid: uid, username: username, phone: '', email: email);
+
+  /// À appeler au démarrage sur web pour récupérer le résultat du redirect Google.
+  /// Retourne `true` si un utilisateur vient de se connecter via redirect.
+  static Future<bool> handleRedirectResult() async {
+    if (!kIsWeb) return false;
+    try {
+      final result = await _auth.getRedirectResult();
+      final user = result.user;
+      if (user == null) return false;
+
+      await _ensureProfile(
+        uid:      user.uid,
+        username: user.displayName ?? 'Utilisateur Google',
+        phone:    user.phoneNumber ?? '',
+        email:    user.email ?? '',
+      );
+      return true;
+    } on FirebaseAuthException {
+      return false;
+    } catch (_) {
+      return false;
     }
   }
 

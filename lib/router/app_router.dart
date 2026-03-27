@@ -23,7 +23,9 @@ import '../screens/phone_auth_screen.dart';
 import '../screens/privacy_policy_screen.dart';
 import '../screens/register_screen.dart';
 import '../screens/search_screen.dart';
+import '../screens/email_auth_screen.dart';
 import '../screens/security_screen.dart';
+import '../screens/verification_screen.dart';
 import '../screens/welcome_screen.dart';
 import '../services/cart_service.dart';
 import '../services/commerce_service.dart';
@@ -51,7 +53,9 @@ class Routes {
   static const privacy        = '/privacy';
   static const cgu            = '/cgu';
   static const help           = '/help';
-  static const forgotPassword = '/forgot-password';
+  static const forgotPassword  = '/forgot-password';
+  static const emailAuth      = '/email-auth';
+  static const verification   = '/verification';
 
   static String orderPath(String orderId) => '/order/$orderId';
 }
@@ -103,6 +107,7 @@ class AppRouter {
     final isPublic = location == Routes.welcome ||
         location == Routes.login ||
         location == Routes.phoneAuth ||
+        location == Routes.emailAuth ||
         location == Routes.register ||
         location == Routes.cgu ||
         location == Routes.privacy;
@@ -110,7 +115,8 @@ class AppRouter {
     // Routes d'auth pures (à quitter dès qu'on est connecté)
     final isAuthRoute = location == Routes.welcome ||
         location == Routes.login ||
-        location == Routes.phoneAuth;
+        location == Routes.phoneAuth ||
+        location == Routes.emailAuth;
 
     if (!_auth.isLoggedIn) {
       return isPublic ? null : Routes.login;
@@ -228,6 +234,14 @@ class AppRouter {
         GoRoute(
           path: Routes.forgotPassword,
           builder: (_, __) => const ForgotPasswordScreen(),
+        ),
+        GoRoute(
+          path: Routes.emailAuth,
+          builder: (_, __) => const EmailAuthScreen(),
+        ),
+        GoRoute(
+          path: Routes.verification,
+          builder: (_, __) => const VerificationScreen(),
         ),
       ];
 }

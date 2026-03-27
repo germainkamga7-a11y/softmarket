@@ -234,10 +234,10 @@ class NotificationService {
   static Future<void> _updateToken(String token) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .set({'fcm_token': token}, SetOptions(merge: true));
+    final ref = FirebaseFirestore.instance.collection('users').doc(uid);
+    final snap = await ref.get();
+    if (!snap.exists) return; // Profil pas encore créé, réessai au prochain lancement
+    await ref.update({'fcm_token': token});
     debugPrint('[FCM] Token sauvegardé');
   }
 

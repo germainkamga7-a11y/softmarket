@@ -49,7 +49,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deliver => 'Deliver';
 
   @override
-  String get navMap => 'Map';
+  String get navMap => 'Market';
 
   @override
   String get navHome => 'Home';

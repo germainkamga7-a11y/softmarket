@@ -188,6 +188,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final phone =
             FirebaseAuth.instance.currentUser?.phoneNumber ?? '';
         final avatarUrl = data['avatar_url'] as String?;
+        final verificationStatus =
+            data['verification_status'] as String? ?? 'none';
         final createdAt = data['created_at'] is Timestamp
             ? (data['created_at'] as Timestamp).toDate()
             : null;
@@ -254,17 +256,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const SizedBox(width: 16),
-                      // Nom + téléphone
+                      // Nom + téléphone + badge vérification
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              username,
-                              style: textTheme.titleLarge?.copyWith(
-                                color: colorScheme.onPrimary,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    username,
+                                    style: textTheme.titleLarge?.copyWith(
+                                      color: colorScheme.onPrimary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (verificationStatus == 'verified') ...[
+                                  const SizedBox(width: 6),
+                                  const Tooltip(
+                                    message: 'Identité vérifiée',
+                                    child: Icon(Icons.verified,
+                                        color: Colors.greenAccent, size: 18),
+                                  ),
+                                ],
+                              ],
                             ),
                             if (phone.isNotEmpty)
                               Text(
@@ -273,6 +290,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   color: colorScheme.onPrimary.withValues(alpha: 0.8),
                                 ),
                               ),
+                            const SizedBox(height: 6),
+                            _VerificationBadge(
+                              status: verificationStatus,
+                              onTap: () => context.push(Routes.verification),
+                            ),
                           ],
                         ),
                       ),
@@ -734,7 +756,19 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
   }
 
   Future<void> _save() async {
-    if (_nomCtrl.text.trim().isEmpty) return;
+    final username = _nomCtrl.text.trim();
+    if (username.isEmpty || username.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Le nom doit contenir au moins 2 caractères.')),
+      );
+      return;
+    }
+    if (username.length > 50) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Le nom ne peut pas dépasser 50 caractères.')),
+      );
+      return;
+    }
     setState(() => _saving = true);
     try {
       await FirebaseFirestore.instance
@@ -837,6 +871,98 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Badge de vérification ────────────────────────────────────────────────────
+
+class _VerificationBadge extends StatelessWidget {
+  final String status; // 'none' | 'pending' | 'verified' | 'rejected'
+  final VoidCallback onTap;
+
+  const _VerificationBadge({required this.status, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    if (status == 'verified') {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: Colors.green.shade700,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.verified_user, size: 11, color: Colors.white),
+            SizedBox(width: 4),
+            Text('Identité vérifiée',
+                style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600)),
+          ],
+        ),
+      );
+    }
+
+    if (status == 'pending') {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: Colors.orange.shade700,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.hourglass_top, size: 11, color: Colors.white),
+            SizedBox(width: 4),
+            Text('Vérification en cours',
+                style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600)),
+          ],
+        ),
+      );
+    }
+
+    // none ou rejected → bouton pour démarrer/réessayer
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: status == 'rejected'
+              ? Colors.red.shade700
+              : Colors.white.withValues(alpha: 0.25),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+              color: Colors.white.withValues(alpha: 0.6), width: 1),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              status == 'rejected' ? Icons.refresh : Icons.shield_outlined,
+              size: 11,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              status == 'rejected'
+                  ? 'Refusé — Réessayer'
+                  : 'Vérifier mon identité',
+              style: const TextStyle(
+                  fontSize: 11,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600),
             ),
           ],
         ),

@@ -58,6 +58,26 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
 
   String get _fullPhone => '$_dialCode${_phoneController.text.trim()}';
 
+  /// Valide le numéro selon le pays sélectionné.
+  /// Retourne un message d'erreur ou null si valide.
+  String? _validatePhoneInput() {
+    final digits = _phoneController.text.trim().replaceAll(RegExp(r'\D'), '');
+    if (digits.isEmpty) return 'Numéro de téléphone requis.';
+    // Cameroun : 9 chiffres obligatoires (ex. 6XXXXXXXX)
+    if (_dialCode == '+237') {
+      if (digits.length != 9) return 'Numéro camerounais invalide (9 chiffres attendus).';
+      if (!RegExp(r'^[2367]\d{8}$').hasMatch(digits)) {
+        return 'Numéro camerounais invalide (commence par 2, 3, 6 ou 7).';
+      }
+      return null;
+    }
+    // Autres pays : entre 7 et 15 chiffres (norme ITU E.164)
+    if (digits.length < 7 || digits.length > 15) {
+      return 'Numéro invalide (7 à 15 chiffres).';
+    }
+    return null;
+  }
+
   @override
   void dispose() {
     _phoneController.dispose();
@@ -68,7 +88,11 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   }
 
   Future<void> _sendCode() async {
-    if (_phoneController.text.trim().isEmpty) return;
+    final validationError = _validatePhoneInput();
+    if (validationError != null) {
+      setState(() => _errorMessage = validationError);
+      return;
+    }
     setState(() {
       _loading = true;
       _errorMessage = null;

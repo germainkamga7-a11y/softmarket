@@ -170,6 +170,28 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       const SizedBox(height: 12),
 
+                      // ── Email ──────────────────────────────────────────
+                      SizedBox(
+                        height: 52,
+                        child: OutlinedButton.icon(
+                          onPressed: () => context.push(Routes.emailAuth),
+                          icon: const Icon(Icons.email_outlined),
+                          label: const Text(
+                            'Continuer avec un email',
+                            style: TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.w600),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                                color: colorScheme.outlineVariant, width: 1.5),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
                       // ── Google ─────────────────────────────────────────
                       SizedBox(
                         height: 52,

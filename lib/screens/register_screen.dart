@@ -50,9 +50,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _saveProfile() async {
     final l = AppLocalizations.of(context)!;
-    if (_nomCtrl.text.trim().isEmpty) {
+    final username = _nomCtrl.text.trim();
+    if (username.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l.usernameRequired)),
+      );
+      return;
+    }
+    if (username.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Le nom doit contenir au moins 2 caractères.')),
+      );
+      return;
+    }
+    if (username.length > 50) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Le nom ne peut pas dépasser 50 caractères.')),
       );
       return;
     }
@@ -66,20 +79,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _saving = true);
     try {
       final user = FirebaseAuth.instance.currentUser!;
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .set({
-            'username': _nomCtrl.text.trim(),
-            'ville': _villeSelected,
-            'phone': user.phoneNumber ?? '',
-            'date_naissance': Timestamp.fromDate(_dateNaissance!),
-            'created_at': Timestamp.now(),
-          })
-          .timeout(
-            const Duration(seconds: 10),
-            onTimeout: () => throw TimeoutException('timeout'),
-          );
+      final ref = FirebaseFirestore.instance.collection('users').doc(user.uid);
+      final snap = await ref.get().timeout(const Duration(seconds: 10),
+          onTimeout: () => throw TimeoutException('timeout'));
+      final data = <String, dynamic>{
+        'username': _nomCtrl.text.trim(),
+        'ville': _villeSelected,
+        'phone': user.phoneNumber ?? '',
+        'date_naissance': Timestamp.fromDate(_dateNaissance!),
+      };
+      if (!snap.exists) {
+        data['created_at'] = Timestamp.now();
+        await ref.set(data).timeout(
+              const Duration(seconds: 10),
+              onTimeout: () => throw TimeoutException('timeout'),
+            );
+      } else {
+        await ref.update(data).timeout(
+              const Duration(seconds: 10),
+              onTimeout: () => throw TimeoutException('timeout'),
+            );
+      }
       AnalyticsService.logSignUp('phone');
       if (mounted) context.go(Routes.home);
     } on TimeoutException {

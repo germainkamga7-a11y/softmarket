@@ -40,10 +40,11 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBoKX9bl4uo7zy-HWeO3vv37ZjBGVulSEo',
+    apiKey: 'AIzaSyB6pUWJhwxce7wlBb7kctFahGHk6F27P2Y',
     appId: '1:795518110767:android:52e9903454093b8a7c4ada',
     messagingSenderId: '795518110767',
     projectId: 'softmarket-55f22',
+    authDomain: 'softmarket-55f22.firebaseapp.com',
     storageBucket: 'softmarket-55f22.firebasestorage.app',
   );
 
