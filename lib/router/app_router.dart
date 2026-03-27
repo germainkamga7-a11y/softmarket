@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../main.dart' show navigatorKey;
 import '../providers/auth_provider.dart';
+import '../services/analytics_service.dart';
 import '../screens/add_boutique_screen.dart';
 import '../screens/boutique_screen.dart';
 import '../screens/cart_screen.dart';
@@ -87,6 +88,7 @@ class AppRouter {
       initialLocation: Routes.home,
       redirect: _redirect,
       routes: _routes,
+      observers: [AnalyticsService.observer],
     );
   }
 

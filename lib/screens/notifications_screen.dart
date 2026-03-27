@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
 
@@ -78,9 +80,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: Text(l.notifications),
         backgroundColor: const Color(0xFFCC0000),
         foregroundColor: Colors.white,
       ),
@@ -89,37 +92,37 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           : ListView(
               children: [
                 const SizedBox(height: 12),
-                const _SectionHeader('Activité'),
+                _SectionHeader(l.notifSectionActivity),
                 _NotifTile(
                   icon: Icons.chat_outlined,
-                  title: 'Messages',
-                  subtitle: 'Nouveaux messages des commerçants',
+                  title: l.messages,
+                  subtitle: l.notifMessagesSubtitle,
                   value: _notifMessages,
                   onChanged: (v) => _toggle('messages', v),
                   colorScheme: colorScheme,
                 ),
                 _NotifTile(
                   icon: Icons.shopping_bag_outlined,
-                  title: 'Nouveaux produits',
-                  subtitle: 'Produits ajoutés par vos boutiques favorites',
+                  title: l.notifNewProducts,
+                  subtitle: l.notifNewProductsSubtitle,
                   value: _notifProduits,
                   onChanged: (v) => _toggle('produits', v),
                   colorScheme: colorScheme,
                 ),
                 _NotifTile(
                   icon: Icons.star_outline,
-                  title: 'Avis & Notes',
-                  subtitle: 'Nouveaux avis sur votre boutique',
+                  title: l.notifReviews,
+                  subtitle: l.notifReviewsSubtitle,
                   value: _notifAvis,
                   onChanged: (v) => _toggle('avis', v),
                   colorScheme: colorScheme,
                 ),
                 const SizedBox(height: 8),
-                const _SectionHeader('Marketing'),
+                _SectionHeader(l.notifSectionMarketing),
                 _NotifTile(
                   icon: Icons.local_offer_outlined,
-                  title: 'Promotions & Offres',
-                  subtitle: 'Offres spéciales et réductions',
+                  title: l.notifPromos,
+                  subtitle: l.notifPromosSubtitle,
                   value: _notifPromos,
                   onChanged: (v) => _toggle('promos', v),
                   colorScheme: colorScheme,
@@ -128,7 +131,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
-                    'Les notifications système (sécurité, compte) sont toujours activées.',
+                    l.notifSystemNote,
                     style: TextStyle(
                         fontSize: 12, color: colorScheme.onSurfaceVariant),
                     textAlign: TextAlign.center,

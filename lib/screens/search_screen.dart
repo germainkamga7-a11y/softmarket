@@ -1,9 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
+import '../providers/commerce_provider.dart';
 import '../router/app_router.dart';
+import '../services/analytics_service.dart';
 import '../services/commerce_service.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -17,15 +19,12 @@ class _SearchScreenState extends State<SearchScreen> {
   final _searchCtrl = TextEditingController();
   final _focusNode = FocusNode();
 
-  List<Commerce> _allCommerces = [];
   List<Commerce> _results = [];
-  bool _loading = true;
   String _query = '';
 
   @override
   void initState() {
     super.initState();
-    _loadCommerces();
     WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
   }
 
@@ -36,24 +35,14 @@ class _SearchScreenState extends State<SearchScreen> {
     super.dispose();
   }
 
-  Future<void> _loadCommerces() async {
-    final snap = await FirebaseFirestore.instance
-        .collection('commercants')
-        .orderBy('created_at', descending: true)
-        .get();
-    setState(() {
-      _allCommerces = snap.docs.map(Commerce.fromDoc).toList();
-      _loading = false;
-    });
-  }
-
   void _onSearch(String query) {
+    final allCommerces = context.read<CommerceProvider>().commerces;
     setState(() {
       _query = query.toLowerCase().trim();
       if (_query.isEmpty) {
         _results = [];
       } else {
-        _results = _allCommerces
+        _results = allCommerces
             .where((c) =>
                 c.nomBoutique.toLowerCase().contains(_query) ||
                 c.nomCommercant.toLowerCase().contains(_query) ||
@@ -62,12 +51,18 @@ class _SearchScreenState extends State<SearchScreen> {
             .toList();
       }
     });
+    // Log uniquement à partir de 3 caractères pour éviter de tracker chaque touche
+    if (_query.length >= 3) {
+      AnalyticsService.logSearch(_query);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final commerceProvider = context.watch<CommerceProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -77,7 +72,7 @@ class _SearchScreenState extends State<SearchScreen> {
           focusNode: _focusNode,
           onChanged: _onSearch,
           decoration: InputDecoration(
-            hintText: 'Rechercher un commerçant, un produit...',
+            hintText: l.searchBarHint,
             border: InputBorder.none,
             suffixIcon: _query.isNotEmpty
                 ? IconButton(
@@ -91,36 +86,37 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
         ),
       ),
-      body: _loading
+      body: commerceProvider.isLoading
           ? const Center(child: CircularProgressIndicator())
           : _query.isEmpty
-              ? _buildSuggestions(colorScheme, textTheme)
+              ? _buildSuggestions(l, colorScheme, textTheme, commerceProvider.commerces)
               : _results.isEmpty
-                  ? _buildEmpty(colorScheme, textTheme)
-                  : _buildResults(colorScheme, textTheme),
+                  ? _buildEmpty(l, colorScheme, textTheme)
+                  : _buildResults(l, colorScheme, textTheme),
     );
   }
 
   // ─── Suggestions (avant recherche) ────────────────────────────────────────
 
-  Widget _buildSuggestions(ColorScheme colorScheme, TextTheme textTheme) {
+  Widget _buildSuggestions(AppLocalizations l,
+      ColorScheme colorScheme, TextTheme textTheme, List<Commerce> all) {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text('Commerçants récents',
+        Text(l.searchRecentMerchants,
             style: textTheme.titleSmall
                 ?.copyWith(color: colorScheme.onSurfaceVariant)),
         const SizedBox(height: 12),
-        ..._allCommerces.take(5).map((c) => _CommerceListTile(
+        ...all.take(5).map((c) => _CommerceListTile(
               commerce: c,
               query: '',
               onTap: () => _openBoutique(c),
             )),
-        if (_allCommerces.isEmpty)
+        if (all.isEmpty)
           Center(
             child: Padding(
               padding: const EdgeInsets.all(32),
-              child: Text('Aucun commerçant enregistré',
+              child: Text(l.searchNoMerchant,
                   style: textTheme.bodyMedium
                       ?.copyWith(color: colorScheme.onSurfaceVariant)),
             ),
@@ -131,7 +127,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   // ─── Aucun résultat ────────────────────────────────────────────────────────
 
-  Widget _buildEmpty(ColorScheme colorScheme, TextTheme textTheme) {
+  Widget _buildEmpty(AppLocalizations l, ColorScheme colorScheme, TextTheme textTheme) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -140,10 +136,9 @@ class _SearchScreenState extends State<SearchScreen> {
               size: 64,
               color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4)),
           const SizedBox(height: 16),
-          Text('Aucun résultat pour "$_query"',
-              style: textTheme.titleMedium),
+          Text(l.searchNoResultFor(_query), style: textTheme.titleMedium),
           const SizedBox(height: 8),
-          Text('Essayez un autre nom, catégorie ou description',
+          Text(l.searchNoResultHint,
               style: textTheme.bodyMedium
                   ?.copyWith(color: colorScheme.onSurfaceVariant)),
         ],
@@ -153,14 +148,14 @@ class _SearchScreenState extends State<SearchScreen> {
 
   // ─── Résultats ─────────────────────────────────────────────────────────────
 
-  Widget _buildResults(ColorScheme colorScheme, TextTheme textTheme) {
+  Widget _buildResults(AppLocalizations l, ColorScheme colorScheme, TextTheme textTheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
           child: Text(
-            '${_results.length} résultat${_results.length > 1 ? 's' : ''}',
+            l.searchResultCount(_results.length, _results.length > 1 ? 's' : ''),
             style: textTheme.bodySmall
                 ?.copyWith(color: colorScheme.onSurfaceVariant),
           ),

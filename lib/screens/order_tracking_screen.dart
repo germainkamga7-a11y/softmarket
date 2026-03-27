@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../l10n/app_localizations.dart';
 import '../services/order_service.dart';
 import '../theme/app_colors.dart';
 
@@ -19,7 +20,9 @@ class OrderTrackingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isNewOrder ? 'Commande confirmée !' : 'Suivi de commande'),
+        title: Text(isNewOrder
+            ? AppLocalizations.of(context)!.orderConfirmedTitle
+            : AppLocalizations.of(context)!.orderTrackingTitle),
         leading: isNewOrder
             ? IconButton(
                 icon: const Icon(Icons.home_outlined),
@@ -37,7 +40,7 @@ class OrderTrackingScreen extends StatelessWidget {
           }
           final order = snap.data;
           if (order == null) {
-            return const Center(child: Text('Commande introuvable.'));
+            return Center(child: Text(AppLocalizations.of(context)!.orderNotFound));
           }
           return _OrderBody(order: order);
         },
@@ -52,6 +55,7 @@ class _OrderBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final fmt = DateFormat('dd MMM yyyy à HH:mm', 'fr_FR');
@@ -79,7 +83,7 @@ class _OrderBody extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Commande #${order.id.substring(0, 8).toUpperCase()}',
+                    Text('${l.orderTrackingTitle} #${order.id.substring(0, 8).toUpperCase()}',
                         style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
                     Text(fmt.format(order.createdAt),
                         style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
@@ -93,14 +97,14 @@ class _OrderBody extends StatelessWidget {
         const SizedBox(height: 24),
 
         // ── Timeline de suivi ────────────────────────────────────────────
-        Text('Suivi', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        Text(l.orderTrackingSection, style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 16),
         _TrackingTimeline(statut: order.statut),
 
         const SizedBox(height: 28),
 
         // ── Articles commandés ───────────────────────────────────────────
-        Text('Articles (${order.itemCount})',
+        Text(l.itemsWithCount(order.itemCount),
             style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         ...order.items.map((item) => Padding(
@@ -151,21 +155,21 @@ class _OrderBody extends StatelessWidget {
         // ── Récap livraison + paiement ───────────────────────────────────
         _InfoRow(
           icon: Icons.location_on_outlined,
-          label: 'Livraison',
+          label: l.deliveryLabel,
           value: order.adresseLivraison,
         ),
         const SizedBox(height: 8),
         _InfoRow(
           icon: Icons.phone_outlined,
-          label: 'Contact',
+          label: l.contactLabel,
           value: order.telephone,
         ),
         const SizedBox(height: 8),
         _InfoRow(
           icon: Icons.payments_outlined,
-          label: 'Paiement',
+          label: l.paymentLabel,
           value: order.modePaiement == 'livraison'
-              ? 'À la livraison (espèces)'
+              ? l.paymentCODLabel
               : 'Mobile Money',
         ),
 
@@ -174,7 +178,7 @@ class _OrderBody extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Total', style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+            Text(l.cartTotal, style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
             Text('${order.total.round()} FCFA',
                 style: textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold, color: AppColors.priceColor(context))),
@@ -188,7 +192,7 @@ class _OrderBody extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: () => _confirmCancel(context, order.id),
             icon: const Icon(Icons.cancel_outlined, size: 18),
-            label: const Text('Annuler la commande'),
+            label: Text(AppLocalizations.of(context)!.cancelOrder),
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.red,
               side: const BorderSide(color: Colors.red),
@@ -205,26 +209,29 @@ class _OrderBody extends StatelessWidget {
   Future<void> _confirmCancel(BuildContext context, String orderId) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Annuler la commande ?'),
-        content: const Text('Cette action est irréversible.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Non')),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Oui, annuler'),
-          ),
-        ],
-      ),
+      builder: (ctx) {
+        final l = AppLocalizations.of(ctx)!;
+        return AlertDialog(
+          title: Text(l.cancelOrderDialogTitle),
+          content: Text(l.irreversibleAction),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.no)),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              style: FilledButton.styleFrom(backgroundColor: Colors.red),
+              child: Text(l.yesCancelOrder),
+            ),
+          ],
+        );
+      },
     );
     if (confirmed == true) {
       try {
         await OrderService.cancelOrder(orderId);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Commande annulée'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.orderStatusAnnulee),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -249,6 +256,7 @@ class _StatusBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final (color, icon, bg) = _theme();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -272,7 +280,7 @@ class _StatusBanner extends StatelessWidget {
                 Text(statut.label,
                     style: TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 16, color: color)),
-                Text(_subtitle(), style: TextStyle(fontSize: 12, color: color.withValues(alpha: 0.8))),
+                Text(_subtitle(l), style: TextStyle(fontSize: 12, color: color.withValues(alpha: 0.8))),
               ],
             ),
           ),
@@ -296,13 +304,13 @@ class _StatusBanner extends StatelessWidget {
     }
   }
 
-  String _subtitle() {
+  String _subtitle(AppLocalizations l) {
     switch (statut) {
-      case OrderStatus.enAttente:   return 'En attente de confirmation du vendeur';
-      case OrderStatus.confirmee:   return 'Le vendeur a confirmé votre commande';
-      case OrderStatus.enLivraison: return 'Votre commande est en route !';
-      case OrderStatus.livree:      return 'Commande livrée avec succès';
-      case OrderStatus.annulee:     return 'Commande annulée';
+      case OrderStatus.enAttente:   return l.orderStatusSubtitleEnAttente;
+      case OrderStatus.confirmee:   return l.orderStatusSubtitleConfirmee;
+      case OrderStatus.enLivraison: return l.orderStatusSubtitleEnLivraison;
+      case OrderStatus.livree:      return l.orderStatusSubtitleLivree;
+      case OrderStatus.annulee:     return l.orderStatusAnnulee;
     }
   }
 }
@@ -334,7 +342,7 @@ class _TrackingTimeline extends StatelessWidget {
           children: [
             const Icon(Icons.cancel_outlined, color: Colors.red, size: 20),
             const SizedBox(width: 10),
-            Text('Commande annulée', style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.w600)),
+            Text(AppLocalizations.of(context)!.orderStatusAnnulee, style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.w600)),
           ],
         ),
       );

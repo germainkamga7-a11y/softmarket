@@ -11,6 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../providers/commerce_provider.dart';
 import '../router/app_router.dart';
 import '../services/cart_service.dart';
 import '../services/map_service.dart';
@@ -18,6 +19,7 @@ import '../services/commerce_service.dart';
 import '../services/favorite_service.dart';
 import '../services/social_auth_service.dart';
 import '../theme/app_colors.dart';
+import '../l10n/app_localizations.dart';
 import 'favorites_screen.dart';
 import 'orders_list_screen.dart';
 import 'product_detail_screen.dart';
@@ -34,12 +36,8 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
   int _selectedIndex = 0;
   final MapService _mapService = MapService();
   final CommerceService _commerceService = CommerceService();
-  StreamSubscription<List<Commerce>>? _commerceSubscription;
+  late CommerceProvider _commerceProvider;
   StreamSubscription<Position>? _locationSubscription;
-  List<Commerce> _commerces = [];
-  bool _loadingCommerces = true; // Indicateur initial de chargement
-  String? _commerceError; // Message d'erreur réseau
-  static const int _commercesLimit = 200;
 
   String? _selectedMapCategory;
   MapType _mapType = MapType.normal;
@@ -69,10 +67,29 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
   void initState() {
     super.initState();
     _initialLocationFuture = _mapService.getCurrentLocation();
-    _initializeMap();
+    _preloadMapIcons();
     _startLocationStream();
     _loadInitialProducts();
     _checkProfile();
+  }
+
+  bool _commerceListenerAttached = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_commerceListenerAttached) {
+      _commerceListenerAttached = true;
+      _commerceProvider = context.read<CommerceProvider>();
+      _commerceProvider.addListener(_onCommercesUpdated);
+    }
+  }
+
+  void _onCommercesUpdated() {
+    if (mounted) {
+      setState(() {});
+      _updateMapMarkers();
+    }
   }
 
   // Redirige vers /register si le profil Firestore n'existe pas encore
@@ -120,53 +137,12 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
     }
   }
 
-  Future<void> _initializeMap({bool retry = false}) async {
-    if (retry) {
-      _commerceSubscription?.cancel();
-      if (mounted) setState(() { _loadingCommerces = true; _commerceError = null; });
-    }
-
+  Future<void> _preloadMapIcons() async {
     try {
       await _mapService.preloadIcons();
     } catch (e) {
       debugPrint('[CamerMarket] preloadIcons ignoré : $e');
     }
-
-    _commerceSubscription = _commerceService
-        .streamCommerces(limit: _commercesLimit)
-        .listen(
-      (commerces) {
-        debugPrint('[CamerMarket] ${commerces.length} commerces reçus');
-        if (mounted) {
-          setState(() {
-            _commerces = commerces;
-            _loadingCommerces = false;
-            _commerceError = null;
-          });
-        }
-        _updateMapMarkers();
-      },
-      onError: (e) {
-        debugPrint('[CamerMarket] Erreur stream commerces: $e');
-        if (mounted) {
-          setState(() {
-            _loadingCommerces = false;
-            _commerceError = _isNetworkError(e)
-                ? 'Connexion impossible. Vérifiez votre réseau.'
-                : 'Impossible de charger les commerces.';
-          });
-        }
-      },
-    );
-  }
-
-  bool _isNetworkError(Object e) {
-    final msg = e.toString().toLowerCase();
-    return msg.contains('network') ||
-        msg.contains('unavailable') ||
-        msg.contains('timeout') ||
-        msg.contains('socket') ||
-        msg.contains('connection');
   }
 
   Future<void> _startLocationStream() async {
@@ -209,14 +185,14 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
   }
 
   List<String> get _mapCategories {
-    final cats = _commerces.map((c) => c.categorie).toSet().toList();
+    final cats = _commerceProvider.commerces.map((c) => c.categorie).toSet().toList();
     cats.sort();
     return cats;
   }
 
   /// Commerces filtrés + triés selon tous les critères actifs
   List<Commerce> get _filteredCommerces {
-    var list = _commerces.where((c) {
+    var list = _commerceProvider.commerces.where((c) {
       if (_selectedMapCategory != null && c.categorie != _selectedMapCategory) {
         return false;
       }
@@ -275,7 +251,9 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
 
   @override
   void dispose() {
-    _commerceSubscription?.cancel();
+    if (_commerceListenerAttached) {
+      _commerceProvider.removeListener(_onCommercesUpdated);
+    }
     _locationSubscription?.cancel();
     _mapService.dispose();
     super.dispose();
@@ -294,6 +272,7 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -305,14 +284,22 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
       bottomSheet: authProvider.isAnonymous
           ? _AnonBanner()
           : null,
-      body: IndexedStack(
-        index: _selectedIndex,
+      body: Column(
         children: [
-          _buildMapTab(),
-          _buildHomeTab(colorScheme, textTheme),
-          const OrdersListScreen(),
-          _buildFavoritesTab(colorScheme, textTheme),
-          _buildProfileTab(colorScheme, textTheme),
+          if (_commerceProvider.hasCachedData)
+            const _OfflineBanner(),
+          Expanded(
+            child: IndexedStack(
+              index: _selectedIndex,
+              children: [
+                _buildMapTab(),
+                _buildHomeTab(colorScheme, textTheme),
+                const OrdersListScreen(),
+                _buildFavoritesTab(colorScheme, textTheme),
+                _buildProfileTab(colorScheme, textTheme),
+              ],
+            ),
+          ),
         ],
       ),
       // FAB "Ajouter un commerce" visible uniquement sur l'onglet carte
@@ -321,7 +308,7 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
               heroTag: 'add_commerce',
               onPressed: _startAddCommerce,
               icon: const Icon(Icons.store_mall_directory),
-              label: const Text('Ajouter un commerce'),
+              label: Text(l.addCommerce),
             )
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -329,31 +316,31 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) =>
             setState(() => _selectedIndex = index),
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.map_outlined),
-            selectedIcon: Icon(Icons.map),
-            label: 'Carte',
+            icon: const Icon(Icons.map_outlined),
+            selectedIcon: const Icon(Icons.map),
+            label: l.navMap,
           ),
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Explorer',
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home),
+            label: l.navExplore,
           ),
           NavigationDestination(
-            icon: Icon(Icons.receipt_long_outlined),
-            selectedIcon: Icon(Icons.receipt_long),
-            label: 'Commandes',
+            icon: const Icon(Icons.receipt_long_outlined),
+            selectedIcon: const Icon(Icons.receipt_long),
+            label: l.navOrders,
           ),
           NavigationDestination(
-            icon: Icon(Icons.favorite_outline),
-            selectedIcon: Icon(Icons.favorite),
-            label: 'Favoris',
+            icon: const Icon(Icons.favorite_outline),
+            selectedIcon: const Icon(Icons.favorite),
+            label: l.navFavorites,
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profil',
+            icon: const Icon(Icons.person_outline),
+            selectedIcon: const Icon(Icons.person),
+            label: l.navProfile,
           ),
         ],
       ),
@@ -730,7 +717,7 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                               );
                             }
                             final p = _homeProducts[index];
-                            final commerce = _commerces
+                            final commerce = _commerceProvider.commerces
                                 .where((c) => c.id == p['commerce_id'])
                                 .firstOrNull;
                             final rawUrls = p['image_urls'];
@@ -793,9 +780,7 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
               ),
             ),
           ),
-          // Utilise _commerces depuis le stream unique dans _initializeMap()
-          // (évite un double listener Firestore qui saturait le réseau)
-          if (_loadingCommerces)
+          if (_commerceProvider.isLoading)
             const SliverToBoxAdapter(
               child: Center(
                 child: Padding(
@@ -804,7 +789,7 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                 ),
               ),
             )
-          else if (_commerces.isEmpty)
+          else if (_commerceProvider.commerces.isEmpty)
             SliverToBoxAdapter(
               child: _buildEmptyState(
                   'Aucun commerce trouvé', Icons.storefront_outlined),
@@ -815,9 +800,9 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                 (context, index) => Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-                  child: _MarketCard(commerce: _commerces[index]),
+                  child: _MarketCard(commerce: _commerceProvider.commerces[index]),
                 ),
-                childCount: _commerces.length,
+                childCount: _commerceProvider.commerces.length,
               ),
             ),
 
@@ -828,14 +813,14 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
   }
 
   Widget _buildEmptyState(String message, IconData icon) {
+    final color = Theme.of(context).colorScheme.onSurfaceVariant;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 40, color: Colors.grey.withValues(alpha: 0.5)),
+          Icon(icon, size: 40, color: color.withValues(alpha: 0.5)),
           const SizedBox(height: 8),
-          Text(message,
-              style: const TextStyle(color: Colors.grey, fontSize: 13)),
+          Text(message, style: TextStyle(color: color, fontSize: 13)),
         ],
       ),
     );
@@ -1031,7 +1016,7 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: colorScheme.surface,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: const [
                         BoxShadow(color: Colors.black26, blurRadius: 4)
@@ -1084,7 +1069,7 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
             ),
 
             // ── Bannière erreur réseau ──
-            if (_commerceError != null)
+            if (_commerceProvider.error != null)
               Positioned(
                 top: 210,
                 left: 16,
@@ -1104,12 +1089,12 @@ class _CamerMarketScreenState extends State<CamerMarketScreen> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            _commerceError!,
+                            _commerceProvider.error!,
                             style: const TextStyle(color: Colors.white, fontSize: 13),
                           ),
                         ),
                         TextButton(
-                          onPressed: () => _initializeMap(retry: true),
+                          onPressed: _commerceProvider.retry,
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -1908,6 +1893,41 @@ class _AnonBanner extends StatelessWidget {
                 child: const Text('Créer un compte',
                     style: TextStyle(
                         fontSize: 12, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Bannière hors-ligne ──────────────────────────────────────────────────────
+
+class _OfflineBanner extends StatelessWidget {
+  const _OfflineBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.orange.shade700,
+      child: const SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          child: Row(
+            children: [
+              Icon(Icons.wifi_off, size: 14, color: Colors.white),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Hors ligne • données en cache',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ],
           ),

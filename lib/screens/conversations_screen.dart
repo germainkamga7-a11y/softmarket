@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import 'package:go_router/go_router.dart';
 
+import '../l10n/app_localizations.dart';
 import '../router/app_router.dart';
 import '../services/chat_service.dart';
 
@@ -37,9 +38,10 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Messages'),
+        title: Text(l.messages),
         centerTitle: false,
         titleTextStyle: Theme.of(context)
             .textTheme
@@ -64,11 +66,10 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                       size: 80,
                       color: colorScheme.outlineVariant),
                   const SizedBox(height: 16),
-                  Text('Aucune conversation',
-                      style: textTheme.titleMedium),
+                  Text(l.noConversation, style: textTheme.titleMedium),
                   const SizedBox(height: 8),
                   Text(
-                    'Contactez un commerçant\npour démarrer une conversation',
+                    l.noConversationHint,
                     textAlign: TextAlign.center,
                     style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant),
@@ -139,10 +140,10 @@ class _ConversationTile extends StatelessWidget {
     required this.currentUid,
   });
 
-  String _formatTime(DateTime dt) {
+  String _formatTime(DateTime dt, BuildContext context) {
     final now = DateTime.now();
     final diff = now.difference(dt);
-    if (diff.inMinutes < 1) return 'À l\'instant';
+    if (diff.inMinutes < 1) return AppLocalizations.of(context)!.justNow;
     if (diff.inHours < 1) return '${diff.inMinutes} min';
     if (diff.inDays < 1) return DateFormat('HH:mm').format(dt);
     if (diff.inDays < 7) return DateFormat('EEE', 'fr_FR').format(dt);
@@ -196,7 +197,7 @@ class _ConversationTile extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       trailing: Text(
-        _formatTime(updatedAt),
+        _formatTime(updatedAt, context),
         style: textTheme.labelSmall
             ?.copyWith(color: colorScheme.onSurfaceVariant),
       ),

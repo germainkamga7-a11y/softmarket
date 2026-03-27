@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 
 import '../l10n/app_localizations.dart';
 import '../router/app_router.dart';
+import '../services/analytics_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -79,6 +80,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             const Duration(seconds: 10),
             onTimeout: () => throw TimeoutException('timeout'),
           );
+      AnalyticsService.logSignUp('phone');
       if (mounted) context.go(Routes.home);
     } on TimeoutException {
       if (mounted) {

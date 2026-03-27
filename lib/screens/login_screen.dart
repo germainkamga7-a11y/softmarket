@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../l10n/app_localizations.dart';
 import '../router/app_router.dart';
+import '../services/analytics_service.dart';
 import '../services/social_auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -26,6 +27,8 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       if (result == SocialAuthResult.error) {
         _showError(AppLocalizations.of(context)!.errorGoogleSignIn);
+      } else if (result == SocialAuthResult.success) {
+        AnalyticsService.logLogin('google');
       }
       // Si success → AuthGate détecte le changement et navigue automatiquement
     } catch (e) {
@@ -41,6 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _loadingAnon = true);
     try {
       await SocialAuthService.signInAnonymously();
+      AnalyticsService.logLogin('anonymous');
     } catch (e) {
       if (mounted) _showError('Erreur : ${e.toString()}');
     } finally {

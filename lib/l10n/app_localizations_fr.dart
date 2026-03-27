@@ -409,4 +409,189 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get saving => 'Enregistrement...';
+
+  @override
+  String get navExplore => 'Explorer';
+
+  @override
+  String get favoritesEmptyHint =>
+      'Appuyez sur ♡ dans une boutique\npour l\'ajouter à vos favoris';
+
+  @override
+  String get removeFromFavorites => 'Retirer des favoris';
+
+  @override
+  String get noConversation => 'Aucune conversation';
+
+  @override
+  String get noConversationHint =>
+      'Contactez un commerçant\npour démarrer une conversation';
+
+  @override
+  String get justNow => 'À l\'instant';
+
+  @override
+  String get orderConfirmedTitle => 'Commande confirmée !';
+
+  @override
+  String get orderNotFound => 'Commande introuvable.';
+
+  @override
+  String get orderTrackingSection => 'Suivi';
+
+  @override
+  String get deliveryLabel => 'Livraison';
+
+  @override
+  String get contactLabel => 'Contact';
+
+  @override
+  String get paymentLabel => 'Paiement';
+
+  @override
+  String get paymentCODLabel => 'À la livraison (espèces)';
+
+  @override
+  String get cancelOrderDialogTitle => 'Annuler la commande ?';
+
+  @override
+  String get irreversibleAction => 'Cette action est irréversible.';
+
+  @override
+  String get yesCancelOrder => 'Oui, annuler';
+
+  @override
+  String get orderStatusSubtitleEnAttente =>
+      'En attente de confirmation du vendeur';
+
+  @override
+  String get orderStatusSubtitleConfirmee =>
+      'Le vendeur a confirmé votre commande';
+
+  @override
+  String get orderStatusSubtitleEnLivraison => 'Votre commande est en route !';
+
+  @override
+  String get orderStatusSubtitleLivree => 'Commande livrée avec succès';
+
+  @override
+  String itemsWithCount(int count) {
+    return 'Articles ($count)';
+  }
+
+  @override
+  String get checkoutFinalizeTitle => 'Finaliser la commande';
+
+  @override
+  String get checkoutSummary => 'Récapitulatif';
+
+  @override
+  String get checkoutPayCashSubtitle => 'Vous payez en espèces à la réception';
+
+  @override
+  String get checkoutDeliveryInfo => 'Informations de livraison';
+
+  @override
+  String get checkoutAddressRequired => 'Adresse requise';
+
+  @override
+  String get checkoutAddressTooShort => 'Adresse trop courte';
+
+  @override
+  String get checkoutPhoneRequired => 'Numéro requis';
+
+  @override
+  String get checkoutPhoneInvalid => 'Numéro invalide';
+
+  @override
+  String get processing => 'Traitement…';
+
+  @override
+  String get checkoutTermsNote =>
+      'En confirmant, vous acceptez d\'être contacté par le vendeur pour organiser la livraison.';
+
+  @override
+  String get searchBarHint => 'Rechercher un commerçant, un produit...';
+
+  @override
+  String get searchRecentMerchants => 'Commerçants récents';
+
+  @override
+  String get searchNoMerchant => 'Aucun commerçant enregistré';
+
+  @override
+  String searchNoResultFor(String query) {
+    return 'Aucun résultat pour \"$query\"';
+  }
+
+  @override
+  String get searchNoResultHint =>
+      'Essayez un autre nom, catégorie ou description';
+
+  @override
+  String searchResultCount(int count, String plural) {
+    return '$count résultat$plural';
+  }
+
+  @override
+  String get phoneCodeSent => 'Code envoyé';
+
+  @override
+  String phoneCodeSentSubtitle(String phone) {
+    return 'Entrez le code reçu par SMS sur $phone';
+  }
+
+  @override
+  String get phoneSendCodeSubtitle =>
+      'Nous vous enverrons un code de vérification';
+
+  @override
+  String get phoneWithoutDialCode => 'Numéro sans indicatif';
+
+  @override
+  String get phoneHint => 'Ex : 699123456';
+
+  @override
+  String get phoneVerifyCode => 'Vérifier le code';
+
+  @override
+  String get phoneSendCode => 'Envoyer le code';
+
+  @override
+  String get phoneResendCode => 'Renvoyer le code';
+
+  @override
+  String get phoneChangeNumber => 'Modifier le numéro';
+
+  @override
+  String get notifSectionActivity => 'Activité';
+
+  @override
+  String get notifMessagesSubtitle => 'Nouveaux messages des commerçants';
+
+  @override
+  String get notifNewProducts => 'Nouveaux produits';
+
+  @override
+  String get notifNewProductsSubtitle =>
+      'Produits ajoutés par vos boutiques favorites';
+
+  @override
+  String get notifReviews => 'Avis & Notes';
+
+  @override
+  String get notifReviewsSubtitle => 'Nouveaux avis sur votre boutique';
+
+  @override
+  String get notifSectionMarketing => 'Marketing';
+
+  @override
+  String get notifPromos => 'Promotions & Offres';
+
+  @override
+  String get notifPromosSubtitle => 'Offres spéciales et réductions';
+
+  @override
+  String get notifSystemNote =>
+      'Les notifications système (sécurité, compte) sont toujours activées.';
 }

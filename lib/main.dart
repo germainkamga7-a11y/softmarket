@@ -13,6 +13,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
+import 'providers/commerce_provider.dart';
 import 'router/app_router.dart';
 import 'services/cart_service.dart';
 import 'services/notification_service.dart';
@@ -91,6 +92,7 @@ class _SoftMarketAppState extends State<SoftMarketApp> {
       providers: [
         ChangeNotifierProvider.value(value: _auth),
         ChangeNotifierProvider(create: (_) => CartService()),
+        ChangeNotifierProvider(create: (_) => CommerceProvider()),
       ],
       child: _buildApp(),
     );

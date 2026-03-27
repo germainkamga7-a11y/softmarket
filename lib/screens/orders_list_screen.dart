@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../l10n/app_localizations.dart';
 import '../router/app_router.dart';
 import '../services/order_service.dart';
 import '../theme/app_colors.dart';
@@ -11,6 +12,7 @@ class OrdersListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -25,7 +27,7 @@ class OrdersListScreen extends StatelessWidget {
           flexibleSpace: FlexibleSpaceBar(
             titlePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             title: Text(
-              'Mes commandes',
+              l.ordersListTitle,
               style: textTheme.headlineSmall?.copyWith(
                 color: colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
@@ -62,11 +64,10 @@ class OrdersListScreen extends StatelessWidget {
                           size: 72,
                           color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4)),
                       const SizedBox(height: 16),
-                      Text('Aucune commande',
-                          style: textTheme.titleMedium),
+                      Text(l.ordersEmpty, style: textTheme.titleMedium),
                       const SizedBox(height: 8),
                       Text(
-                        'Vos commandes apparaîtront ici.',
+                        l.ordersEmptySubtitle,
                         style: textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant),
                         textAlign: TextAlign.center,

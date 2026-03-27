@@ -109,15 +109,15 @@ flutter pub add <package>
 - ✅ Suppression compte complète (Firestore + Auth + re-auth)
 
 ## Améliorations restantes
-- [ ] Migrer vers go_router (navigation centralisée)
-- [ ] Ajouter Provider global (AuthProvider, CommerceProvider)
-- [ ] Ajouter unit tests et widget tests
-- [ ] Dark mode complet
-- [ ] Offline support (Firestore persistence)
-- [ ] i18n (français + anglais pour le Cameroun bilingue)
-- [ ] Analytics Firebase
-- [ ] Numéro Mobile Money vendeur dans profil boutique
-- [ ] Cloud Functions pour notifications push serveur
+- ✅ Migrer vers go_router (navigation centralisée)
+- ✅ Ajouter Provider global (AuthProvider, CommerceProvider)
+- ✅ Ajouter unit tests et widget tests
+- ✅ Dark mode complet
+- ✅ Offline support (Firestore persistence)
+- ✅ i18n (français + anglais pour le Cameroun bilingue)
+- ✅ Analytics Firebase
+- ✅ Numéro Mobile Money vendeur dans profil boutique
+- ✅ Cloud Functions pour notifications push serveur
 
 ## Git workflow
 - Branches : `feature/description`, `fix/description`

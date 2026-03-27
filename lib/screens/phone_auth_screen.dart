@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../l10n/app_localizations.dart';
+import '../services/analytics_service.dart';
+
 class PhoneAuthScreen extends StatefulWidget {
   final bool isLogin;
   final VoidCallback? onVerified;
@@ -143,6 +146,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         );
         await FirebaseAuth.instance.signInWithCredential(credential);
       }
+      AnalyticsService.logLogin('phone');
       if (!mounted) return;
       if (widget.onVerified != null) {
         widget.onVerified!();
@@ -179,6 +183,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -206,17 +211,15 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                     ? _StepHeader(
                         key: const ValueKey('otp'),
                         icon: Icons.sms_outlined,
-                        title: 'Code envoyé',
-                        subtitle:
-                            'Entrez le code reçu par SMS sur $_fullPhone',
+                        title: l.phoneCodeSent,
+                        subtitle: l.phoneCodeSentSubtitle(_fullPhone),
                         color: colorScheme.primary,
                       )
                     : _StepHeader(
                         key: const ValueKey('phone'),
                         icon: Icons.phone_outlined,
-                        title: widget.isLogin ? 'Connexion' : 'Créer un compte',
-                        subtitle:
-                            'Nous vous enverrons un code de vérification',
+                        title: widget.isLogin ? l.signIn : l.createAccount,
+                        subtitle: l.phoneSendCodeSubtitle,
                         color: colorScheme.primary,
                       ),
               ),
@@ -239,8 +242,8 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   autofocus: true,
                   style: const TextStyle(fontSize: 18, letterSpacing: 1),
                   decoration: InputDecoration(
-                    labelText: 'Numéro sans indicatif',
-                    hintText: 'Ex : 699123456',
+                    labelText: l.phoneWithoutDialCode,
+                    hintText: l.phoneHint,
                     prefixIcon: Icon(
                       Icons.phone_outlined,
                       color: colorScheme.onSurfaceVariant,
@@ -294,7 +297,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                               _otpController.clear();
                             }),
                     child: Text(
-                      'Modifier le numéro',
+                      l.phoneChangeNumber,
                       style:
                           TextStyle(color: colorScheme.onSurfaceVariant),
                     ),
@@ -358,7 +361,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                               strokeWidth: 2, color: Colors.white),
                         )
                       : Text(
-                          _codeSent ? 'Vérifier le code' : 'Envoyer le code',
+                          _codeSent ? l.phoneVerifyCode : l.phoneSendCode,
                           style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w600),
                         ),
@@ -372,7 +375,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   child: TextButton(
                     onPressed: _loading ? null : _sendCode,
                     child: Text(
-                      'Renvoyer le code',
+                      l.phoneResendCode,
                       style: TextStyle(
                           color: colorScheme.primary,
                           fontWeight: FontWeight.w600),

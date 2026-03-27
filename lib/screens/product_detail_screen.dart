@@ -72,6 +72,17 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
   int _currentPage = 0;
 
   @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logViewProduct(
+      productId: widget.docId,
+      nom: widget.nom,
+      prix: widget.prix,
+      categorie: widget.categorie,
+    );
+  }
+
+  @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
@@ -541,12 +552,15 @@ class _ProductDetailModalState extends State<_ProductDetailModal> {
                   targetId: widget.docId,
                   targetName: widget.nom,
                 ),
-                icon: const Icon(Icons.flag_outlined, size: 14, color: Colors.grey),
+                icon: const Icon(Icons.flag_outlined, size: 14),
                 label: const Text(
                   'Signaler ce produit',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                  style: TextStyle(fontSize: 12),
                 ),
-                style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
           ),

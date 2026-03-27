@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../router/app_router.dart';
 import '../services/analytics_service.dart';
 import '../services/cart_service.dart';
@@ -100,9 +101,10 @@ class _OrderCheckoutScreenState extends State<OrderCheckoutScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Finaliser la commande'),
+        title: Text(l.checkoutFinalizeTitle),
       ),
       body: Form(
         key: _formKey,
@@ -110,7 +112,7 @@ class _OrderCheckoutScreenState extends State<OrderCheckoutScreen> {
           padding: const EdgeInsets.all(20),
           children: [
             // ── Récapitulatif commande ───────────────────────────────────
-            Text('Récapitulatif',
+            Text(l.checkoutSummary,
                 style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             ...widget.items.map((item) => Padding(
@@ -195,11 +197,11 @@ class _OrderCheckoutScreenState extends State<OrderCheckoutScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Paiement à la livraison',
+                        Text(l.checkoutPayCash,
                             style: textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.green.shade800)),
-                        Text('Vous payez en espèces à la réception',
+                        Text(l.checkoutPayCashSubtitle,
                             style: textTheme.bodySmall?.copyWith(color: Colors.green.shade700)),
                       ],
                     ),
@@ -212,15 +214,15 @@ class _OrderCheckoutScreenState extends State<OrderCheckoutScreen> {
             const SizedBox(height: 24),
 
             // ── Informations de livraison ─────────────────────────────────
-            Text('Informations de livraison',
+            Text(l.checkoutDeliveryInfo,
                 style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 14),
 
             TextFormField(
               controller: _adresseCtrl,
               decoration: InputDecoration(
-                labelText: 'Adresse de livraison',
-                hintText: 'Quartier, rue, repère...',
+                labelText: l.checkoutAddress,
+                hintText: l.checkoutAddressHint,
                 prefixIcon: const Icon(Icons.location_on_outlined),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 filled: true,
@@ -229,8 +231,8 @@ class _OrderCheckoutScreenState extends State<OrderCheckoutScreen> {
               maxLines: 2,
               textCapitalization: TextCapitalization.sentences,
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'Adresse requise';
-                if (v.trim().length < 10) return 'Adresse trop courte';
+                if (v == null || v.trim().isEmpty) return l.checkoutAddressRequired;
+                if (v.trim().length < 10) return l.checkoutAddressTooShort;
                 return null;
               },
             ),
@@ -240,7 +242,7 @@ class _OrderCheckoutScreenState extends State<OrderCheckoutScreen> {
             TextFormField(
               controller: _telCtrl,
               decoration: InputDecoration(
-                labelText: 'Numéro de téléphone',
+                labelText: l.checkoutPhone,
                 hintText: '6XXXXXXXX',
                 prefixIcon: const Icon(Icons.phone_outlined),
                 prefixText: '+237 ',
@@ -250,9 +252,9 @@ class _OrderCheckoutScreenState extends State<OrderCheckoutScreen> {
               ),
               keyboardType: TextInputType.phone,
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'Numéro requis';
+                if (v == null || v.trim().isEmpty) return l.checkoutPhoneRequired;
                 final digits = v.replaceAll(RegExp(r'\D'), '');
-                if (digits.length < 8) return 'Numéro invalide';
+                if (digits.length < 8) return l.checkoutPhoneInvalid;
                 return null;
               },
             ),
@@ -269,7 +271,7 @@ class _OrderCheckoutScreenState extends State<OrderCheckoutScreen> {
                         width: 18, height: 18,
                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                     : const Icon(Icons.check_circle_outline, size: 20),
-                label: Text(_loading ? 'Traitement…' : 'Confirmer la commande'),
+                label: Text(_loading ? l.processing : l.checkoutConfirm),
                 style: FilledButton.styleFrom(
                   backgroundColor: colorScheme.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -281,7 +283,7 @@ class _OrderCheckoutScreenState extends State<OrderCheckoutScreen> {
             const SizedBox(height: 16),
 
             Text(
-              'En confirmant, vous acceptez d\'être contacté par le vendeur pour organiser la livraison.',
+              l.checkoutTermsNote,
               style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),

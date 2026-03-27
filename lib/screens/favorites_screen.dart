@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
 
+import '../l10n/app_localizations.dart';
 import '../router/app_router.dart';
 import '../services/commerce_service.dart';
 import '../services/favorite_service.dart';
@@ -31,6 +32,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -51,11 +53,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 Icon(Icons.favorite_outline,
                     size: 80, color: colorScheme.outlineVariant),
                 const SizedBox(height: 16),
-                Text('Aucun favori',
-                    style: textTheme.titleMedium),
+                Text(l.favoritesEmpty, style: textTheme.titleMedium),
                 const SizedBox(height: 8),
                 Text(
-                  'Appuyez sur ♡ dans une boutique\npour l\'ajouter à vos favoris',
+                  l.favoritesEmptyHint,
                   textAlign: TextAlign.center,
                   style: textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant),
@@ -69,7 +70,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           slivers: [
             SliverAppBar(
               title: Text(
-                'Mes favoris',
+                l.favoritesTitle,
                 style: textTheme.titleLarge
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
@@ -190,7 +191,7 @@ class _FavoriteCard extends StatelessWidget {
               // Bouton retirer des favoris
               IconButton(
                 icon: const Icon(Icons.favorite, color: Colors.red),
-                tooltip: 'Retirer des favoris',
+                tooltip: AppLocalizations.of(context)!.removeFromFavorites,
                 onPressed: () async {
                   await FavoriteService.toggle(commerce.id!);
                 },

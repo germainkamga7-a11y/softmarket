@@ -192,5 +192,83 @@
 
   "loadShopsError": "Unable to load shops",
 
-  "saving": "Saving..."
+  "saving": "Saving...",
+
+  "navExplore": "Explore",
+  "favoritesEmptyHint": "Tap ♡ on a shop to add it to your favourites",
+  "removeFromFavorites": "Remove from favourites",
+  "noConversation": "No conversations",
+  "noConversationHint": "Contact a merchant\nto start a conversation",
+  "justNow": "Just now",
+  "orderConfirmedTitle": "Order confirmed!",
+  "orderNotFound": "Order not found.",
+  "orderTrackingSection": "Tracking",
+  "deliveryLabel": "Delivery",
+  "contactLabel": "Contact",
+  "paymentLabel": "Payment",
+  "paymentCODLabel": "Cash on delivery",
+  "cancelOrderDialogTitle": "Cancel order?",
+  "irreversibleAction": "This action cannot be undone.",
+  "yesCancelOrder": "Yes, cancel",
+  "orderStatusSubtitleEnAttente": "Waiting for seller confirmation",
+  "orderStatusSubtitleConfirmee": "The seller has confirmed your order",
+  "orderStatusSubtitleEnLivraison": "Your order is on its way!",
+  "orderStatusSubtitleLivree": "Order delivered successfully",
+  "itemsWithCount": "Items ({count})",
+  "@itemsWithCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "checkoutFinalizeTitle": "Checkout",
+  "checkoutSummary": "Summary",
+  "checkoutPayCashSubtitle": "You pay in cash upon receipt",
+  "checkoutDeliveryInfo": "Delivery information",
+  "checkoutAddressRequired": "Address required",
+  "checkoutAddressTooShort": "Address too short",
+  "checkoutPhoneRequired": "Phone number required",
+  "checkoutPhoneInvalid": "Invalid phone number",
+  "processing": "Processing…",
+  "checkoutTermsNote": "By confirming, you agree to be contacted by the seller to arrange delivery.",
+  "searchBarHint": "Search a merchant, product...",
+  "searchRecentMerchants": "Recent merchants",
+  "searchNoMerchant": "No merchants registered",
+  "searchNoResultFor": "No results for \"{query}\"",
+  "@searchNoResultFor": {
+    "placeholders": {
+      "query": { "type": "String" }
+    }
+  },
+  "searchNoResultHint": "Try another name, category or description",
+  "searchResultCount": "{count} result{plural}",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "plural": { "type": "String" }
+    }
+  },
+  "phoneCodeSent": "Code sent",
+  "phoneCodeSentSubtitle": "Enter the code received by SMS on {phone}",
+  "@phoneCodeSentSubtitle": {
+    "placeholders": {
+      "phone": { "type": "String" }
+    }
+  },
+  "phoneSendCodeSubtitle": "We will send you a verification code",
+  "phoneWithoutDialCode": "Number without dial code",
+  "phoneHint": "E.g. 699123456",
+  "phoneVerifyCode": "Verify code",
+  "phoneSendCode": "Send code",
+  "phoneResendCode": "Resend code",
+  "phoneChangeNumber": "Change number",
+  "notifSectionActivity": "Activity",
+  "notifMessagesSubtitle": "New messages from merchants",
+  "notifNewProducts": "New products",
+  "notifNewProductsSubtitle": "Products added by your favourite shops",
+  "notifReviews": "Reviews & Ratings",
+  "notifReviewsSubtitle": "New reviews on your shop",
+  "notifSectionMarketing": "Marketing",
+  "notifPromos": "Promotions & Offers",
+  "notifPromosSubtitle": "Special offers and discounts",
+  "notifSystemNote": "System notifications (security, account) are always enabled."
 }

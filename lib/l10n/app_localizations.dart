@@ -877,6 +877,342 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Enregistrement...'**
   String get saving;
+
+  /// No description provided for @navExplore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Explorer'**
+  String get navExplore;
+
+  /// No description provided for @favoritesEmptyHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appuyez sur ♡ dans une boutique\npour l\'ajouter à vos favoris'**
+  String get favoritesEmptyHint;
+
+  /// No description provided for @removeFromFavorites.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer des favoris'**
+  String get removeFromFavorites;
+
+  /// No description provided for @noConversation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune conversation'**
+  String get noConversation;
+
+  /// No description provided for @noConversationHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contactez un commerçant\npour démarrer une conversation'**
+  String get noConversationHint;
+
+  /// No description provided for @justNow.
+  ///
+  /// In fr, this message translates to:
+  /// **'À l\'instant'**
+  String get justNow;
+
+  /// No description provided for @orderConfirmedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande confirmée !'**
+  String get orderConfirmedTitle;
+
+  /// No description provided for @orderNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande introuvable.'**
+  String get orderNotFound;
+
+  /// No description provided for @orderTrackingSection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suivi'**
+  String get orderTrackingSection;
+
+  /// No description provided for @deliveryLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Livraison'**
+  String get deliveryLabel;
+
+  /// No description provided for @contactLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contact'**
+  String get contactLabel;
+
+  /// No description provided for @paymentLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement'**
+  String get paymentLabel;
+
+  /// No description provided for @paymentCODLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'À la livraison (espèces)'**
+  String get paymentCODLabel;
+
+  /// No description provided for @cancelOrderDialogTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler la commande ?'**
+  String get cancelOrderDialogTitle;
+
+  /// No description provided for @irreversibleAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette action est irréversible.'**
+  String get irreversibleAction;
+
+  /// No description provided for @yesCancelOrder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oui, annuler'**
+  String get yesCancelOrder;
+
+  /// No description provided for @orderStatusSubtitleEnAttente.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente de confirmation du vendeur'**
+  String get orderStatusSubtitleEnAttente;
+
+  /// No description provided for @orderStatusSubtitleConfirmee.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le vendeur a confirmé votre commande'**
+  String get orderStatusSubtitleConfirmee;
+
+  /// No description provided for @orderStatusSubtitleEnLivraison.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre commande est en route !'**
+  String get orderStatusSubtitleEnLivraison;
+
+  /// No description provided for @orderStatusSubtitleLivree.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande livrée avec succès'**
+  String get orderStatusSubtitleLivree;
+
+  /// No description provided for @itemsWithCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Articles ({count})'**
+  String itemsWithCount(int count);
+
+  /// No description provided for @checkoutFinalizeTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Finaliser la commande'**
+  String get checkoutFinalizeTitle;
+
+  /// No description provided for @checkoutSummary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Récapitulatif'**
+  String get checkoutSummary;
+
+  /// No description provided for @checkoutPayCashSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous payez en espèces à la réception'**
+  String get checkoutPayCashSubtitle;
+
+  /// No description provided for @checkoutDeliveryInfo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Informations de livraison'**
+  String get checkoutDeliveryInfo;
+
+  /// No description provided for @checkoutAddressRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse requise'**
+  String get checkoutAddressRequired;
+
+  /// No description provided for @checkoutAddressTooShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse trop courte'**
+  String get checkoutAddressTooShort;
+
+  /// No description provided for @checkoutPhoneRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro requis'**
+  String get checkoutPhoneRequired;
+
+  /// No description provided for @checkoutPhoneInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro invalide'**
+  String get checkoutPhoneInvalid;
+
+  /// No description provided for @processing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Traitement…'**
+  String get processing;
+
+  /// No description provided for @checkoutTermsNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'En confirmant, vous acceptez d\'être contacté par le vendeur pour organiser la livraison.'**
+  String get checkoutTermsNote;
+
+  /// No description provided for @searchBarHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher un commerçant, un produit...'**
+  String get searchBarHint;
+
+  /// No description provided for @searchRecentMerchants.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commerçants récents'**
+  String get searchRecentMerchants;
+
+  /// No description provided for @searchNoMerchant.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun commerçant enregistré'**
+  String get searchNoMerchant;
+
+  /// No description provided for @searchNoResultFor.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun résultat pour \"{query}\"'**
+  String searchNoResultFor(String query);
+
+  /// No description provided for @searchNoResultHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Essayez un autre nom, catégorie ou description'**
+  String get searchNoResultHint;
+
+  /// No description provided for @searchResultCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} résultat{plural}'**
+  String searchResultCount(int count, String plural);
+
+  /// No description provided for @phoneCodeSent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code envoyé'**
+  String get phoneCodeSent;
+
+  /// No description provided for @phoneCodeSentSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrez le code reçu par SMS sur {phone}'**
+  String phoneCodeSentSubtitle(String phone);
+
+  /// No description provided for @phoneSendCodeSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous vous enverrons un code de vérification'**
+  String get phoneSendCodeSubtitle;
+
+  /// No description provided for @phoneWithoutDialCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro sans indicatif'**
+  String get phoneWithoutDialCode;
+
+  /// No description provided for @phoneHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex : 699123456'**
+  String get phoneHint;
+
+  /// No description provided for @phoneVerifyCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifier le code'**
+  String get phoneVerifyCode;
+
+  /// No description provided for @phoneSendCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoyer le code'**
+  String get phoneSendCode;
+
+  /// No description provided for @phoneResendCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Renvoyer le code'**
+  String get phoneResendCode;
+
+  /// No description provided for @phoneChangeNumber.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier le numéro'**
+  String get phoneChangeNumber;
+
+  /// No description provided for @notifSectionActivity.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activité'**
+  String get notifSectionActivity;
+
+  /// No description provided for @notifMessagesSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveaux messages des commerçants'**
+  String get notifMessagesSubtitle;
+
+  /// No description provided for @notifNewProducts.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveaux produits'**
+  String get notifNewProducts;
+
+  /// No description provided for @notifNewProductsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Produits ajoutés par vos boutiques favorites'**
+  String get notifNewProductsSubtitle;
+
+  /// No description provided for @notifReviews.
+  ///
+  /// In fr, this message translates to:
+  /// **'Avis & Notes'**
+  String get notifReviews;
+
+  /// No description provided for @notifReviewsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveaux avis sur votre boutique'**
+  String get notifReviewsSubtitle;
+
+  /// No description provided for @notifSectionMarketing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Marketing'**
+  String get notifSectionMarketing;
+
+  /// No description provided for @notifPromos.
+  ///
+  /// In fr, this message translates to:
+  /// **'Promotions & Offres'**
+  String get notifPromos;
+
+  /// No description provided for @notifPromosSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Offres spéciales et réductions'**
+  String get notifPromosSubtitle;
+
+  /// No description provided for @notifSystemNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les notifications système (sécurité, compte) sont toujours activées.'**
+  String get notifSystemNote;
 }
 
 class _AppLocalizationsDelegate
